@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
+import { createStaticClient } from '@/lib/supabase/static';
 import AddToCartButton from '@/components/AddToCartButton';
 import FavoriteButton from '@/components/FavoriteButton';
 // Aceleași stiluri ca pagina de categorie: grila și cardurile arată identic și
@@ -36,7 +36,7 @@ export default async function SearchResultsPage({
   let products: Product[] = [];
 
   if (term) {
-    const supabase = await createClient();
+    const supabase = createStaticClient();
     // Aceeași funcție folosită de sugestiile din antet, ca rezultatele să fie
     // identice cu cele văzute în timp ce se scrie.
     const { data, error } = await supabase.rpc('search_products', { search_term: term });

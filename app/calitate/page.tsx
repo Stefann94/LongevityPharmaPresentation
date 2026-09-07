@@ -3,17 +3,16 @@ import Image from 'next/image';
 import Link from 'next/link';
 import styles from './Calitate.module.css';
 import pageStyles from '../page.module.css';
-import { createClient } from '../../lib/supabase/server';
+import { createStaticClient } from '@/lib/supabase/static';
 
 export const metadata = {
   title: 'Calitate & Ingrediente | Longevity Farma',
   description: 'Nu facem compromisuri când vine vorba de calitatea și puritatea ingredientelor noastre.',
 };
 
-export const dynamic = 'force-dynamic';
 
 export default async function CalitatePage() {
-  const supabase = await createClient();
+  const supabase = createStaticClient();
   
   // Preluăm conținutul din baza de date
   const { data: contentData } = await supabase.from('calitate_content').select('*');

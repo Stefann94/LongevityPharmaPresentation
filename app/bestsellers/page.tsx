@@ -1,7 +1,6 @@
-import { createClient } from "../../lib/supabase/server";
+import { createStaticClient } from '@/lib/supabase/static';
 import BestsellersClient from "./BestsellersClient";
 
-export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Bestsellers | Longevity Farma',
@@ -9,7 +8,7 @@ export const metadata = {
 };
 
 export default async function BestsellersPage() {
-  const supabase = await createClient();
+  const supabase = createStaticClient();
 
   const { data: products } = await supabase
     .from('products')

@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import { getJournalArticleBySlug } from '../actions';
 import styles from './Article.module.css';
 import ProductSection from '@/components/ProductSection';
-import { createClient } from '@/lib/supabase/server';
+import { createStaticClient } from '@/lib/supabase/static';
 
 export const revalidate = 60;
 
@@ -50,7 +50,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     notFound();
   }
 
-  const supabase = await createClient();
+  const supabase = createStaticClient();
   const { data: recommendedProducts } = await supabase
     .from('products')
     .select('id, name, slug, image_url, price')

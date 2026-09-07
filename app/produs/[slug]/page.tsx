@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getSiteUrl } from '@/lib/site';
-import { createClient } from '../../../lib/supabase/server';
+import { createStaticClient } from '@/lib/supabase/static';
 import styles from './ProductPage.module.css';
 import ProductCarousel from '../../../components/ProductCarousel';
 import ProductImageZoom from '@/components/ProductImageZoom';
@@ -14,7 +14,7 @@ import FavoriteButton from '@/components/FavoriteButton';
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
-  const supabase = await createClient();
+  const supabase = createStaticClient();
   const { data: product } = await supabase.from('products').select('*').eq('slug', decodedSlug).single();
 
   if (!product) {
@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
-  const supabase = await createClient();
+  const supabase = createStaticClient();
   const { data: product } = await supabase.from('products').select('*').eq('slug', decodedSlug).single();
 
   if (!product) {

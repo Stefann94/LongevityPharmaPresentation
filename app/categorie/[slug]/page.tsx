@@ -1,15 +1,14 @@
-import { createClient } from "../../../lib/supabase/server";
+import { createStaticClient } from '@/lib/supabase/static';
 import { notFound } from "next/navigation";
 import CategoryClient from "./CategoryClient";
 
-export const dynamic = 'force-dynamic';
 
 // Fără asta, toate cele 12 pagini de categorie moșteneau titlul și descrierea
 // din layout-ul principal — adică Google le vedea ca pagini identice.
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
-  const supabase = await createClient();
+  const supabase = createStaticClient();
 
   // select('*') în loc de coloane numite: dacă tabelul nu are coloana
   // `description`, o interogare explicită ar eșua și titlul ar fi greșit.
@@ -42,7 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
-  const supabase = await createClient();
+  const supabase = createStaticClient();
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
 

@@ -20,7 +20,6 @@ interface HeaderClientProps {
   categories: Category[];
   featuredProducts: Product[];
   activePromo: Promo | null;
-  user: any;
 }
 
 /**
@@ -52,7 +51,7 @@ const MAIN_NAV_LINKS = [
   { href: '/contact', label: 'Contact' },
 ];
 
-export default function HeaderClient({ categories, featuredProducts, activePromo, user }: HeaderClientProps) {
+export default function HeaderClient({ categories, featuredProducts, activePromo }: HeaderClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -66,6 +65,34 @@ export default function HeaderClient({ categories, featuredProducts, activePromo
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
+
+  // Utilizatorul se afla acum din browser, nu de pe server.
+  //
+  // Inainte, layout-ul citea sesiunea din cookie-uri pe server si o trimitea
+  // ca prop. Asta obliga Next.js sa randeze fiecare pagina la cerere, deci
+  // cerea un server Node - exact ce nu exista pe gazduirea Hostico Start.
+  //
+  // onAuthStateChange mentine antetul sincronizat: la autentificare sau
+  // delogare se actualizeaza singur, fara reincarcarea paginii.
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    let activ = true;
+
+    supabase.auth.getUser().then(({ data }) => {
+      if (activ) setUser(data.user ?? null);
+    });
+
+    const { data: abonament } = supabase.auth.onAuthStateChange((_eveniment, sesiune) => {
+      if (activ) setUser(sesiune?.user ?? null);
+    });
+
+    return () => {
+      activ = false;
+      abonament.subscription.unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Reține dacă panoul de favorite a fost deschis cu degetul: doar atunci are
   // nevoie de un strat de închidere, pentru că nu există hover care să-l ia.

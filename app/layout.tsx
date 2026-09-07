@@ -3,12 +3,10 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { CartProvider } from "./context/CartContext";
-import { FavoritesProvider } from "./context/FavoritesContext";
+import SessionProviders from "./SessionProviders";
 import ScrollToTop from "@/components/ScrollToTop";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import BackToTopButton from "@/components/BackToTopButton";
-import { createClient } from '@/lib/supabase/server';
 import { getSiteUrl } from '@/lib/site';
 
 const outfit = Outfit({
@@ -34,28 +32,26 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const userKey = user?.id || 'guest';
-
+  // Sesiunea nu se mai citește aici. Un singur `auth.getUser()` în layout
+  // citea cookie-uri și forța Next.js să randeze la cerere fiecare pagină din
+  // site, inclusiv cele de catalog care nu au nevoie de nimic personal.
+  // Detecția utilizatorului s-a mutat în SessionProviders, în browser.
   return (
     <html lang="ro">
       <body className={`${outfit.variable}`}>
         <GoogleAnalytics />
         <ScrollToTop />
-        <FavoritesProvider key={userKey}>
-          <CartProvider key={userKey}>
-            <Header />
-            {children}
-            <Footer />
-            <BackToTopButton />
-          </CartProvider>
-        </FavoritesProvider>
+        <SessionProviders>
+          <Header />
+          {children}
+          <Footer />
+          <BackToTopButton />
+        </SessionProviders>
       </body>
     </html>
   );

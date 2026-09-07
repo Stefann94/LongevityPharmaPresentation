@@ -1,14 +1,13 @@
 import Image from "next/image";
 import HeroCarousel from "../components/HeroCarousel";
 import styles from "./page.module.css";
-import { createClient } from "../lib/supabase/server";
+import { createStaticClient } from '@/lib/supabase/static';
 import ProductSection from "../components/ProductSection";
 
 import ProductCarousel from "../components/ProductCarousel";
 
-export const dynamic = 'force-dynamic';
 export default async function Home() {
-  const supabase = await createClient();
+  const supabase = createStaticClient();
   const { data: slidesDb } = await supabase.from('hero_slides').select('*').order('id');
   
   let slides = slidesDb || [];
