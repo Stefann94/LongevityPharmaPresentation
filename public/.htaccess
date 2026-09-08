@@ -31,6 +31,16 @@
 # configuratii Apache nu permit directiva `Options` dintr-un fisier .htaccess.
 Options -Indexes
 
+# Apache adauga din proprie initiativa o bara finala la orice adresa care are un
+# folder cu acelasi nume: /produs/x devenea /produs/x/. Asta se intampla INAINTE
+# ca regulile de mai jos sa apuce sa serveasca pagina, si producea doua
+# redirectionari inlantuite, cu `.html` ajuns in bara de adresa.
+#
+# Oprita, adresa ramane cea scrisa de vizitator, iar pagina este servita direct.
+<IfModule mod_dir.c>
+  DirectorySlash Off
+</IfModule>
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
@@ -46,11 +56,13 @@ Options -Indexes
   RewriteCond %{REQUEST_FILENAME}.html -f
   RewriteRule ^(.*)$ $1.html [L]
 
-  # 3. /contact/ -> contact.html
+  # 3. /contact/ -> /contact
   #    Pentru cine ajunge cu bara finala dintr-un link vechi sau din istoricul
-  #    browserului. Redirectionare permanenta, ca adresa sa ramana una singura.
+  #    browserului. Trimite catre adresa fara bara, nu direct catre fisierul
+  #    .html: asa exista o singura adresa oficiala pentru fiecare pagina, iar
+  #    `.html` nu ajunge niciodata in bara browserului. De acolo preia regula 2.
   RewriteCond %{DOCUMENT_ROOT}/$1.html -f
-  RewriteRule ^(.+)/$ /$1.html [L,R=301]
+  RewriteRule ^(.+)/$ /$1 [L,R=301]
 </IfModule>
 
 # Pagina de eroare generata de Next.js
