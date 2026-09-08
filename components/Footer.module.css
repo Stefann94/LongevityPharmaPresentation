@@ -322,3 +322,62 @@
     flex-wrap: wrap;
   }
 }
+
+/* Datele de contact conțin acum linkuri (telefon, email, site). Fără regula
+   asta ar moșteni albastrul implicit al browserului și ar ieși din paleta
+   footerului. */
+.contactInfo a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.contactInfo a:hover {
+  color: var(--color-accent-dark);
+  text-decoration: underline;
+}
+
+/* Datele de identificare ale firmei.
+   Stau în banda de jos, lângă mențiunile ANPC și copyright — locul obișnuit
+   pentru informațiile legale, unde sunt ușor de găsit fără să încarce coloana
+   de contact. Textul e mai mic și mai discret: se citește la nevoie, nu
+   concurează cu restul footerului. */
+.legalInfo {
+  border-top: 1px solid rgba(39, 79, 56, 0.1);
+  padding-top: 20px;
+  margin-bottom: 24px;
+  color: #6b7d72;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.legalInfo strong {
+  display: block;
+  color: var(--color-primary-dark);
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+/* Pe telefon, datele despărțite prin bară verticală ar produce rânduri rupte
+   ciudat; separatorul dispare și fiecare informație stă pe rândul ei. */
+.legalSep {
+  margin: 0 8px;
+  opacity: 0.5;
+}
+
+@media (max-width: 640px) {
+  .legalInfo {
+    text-align: left;
+  }
+
+  .legalSep {
+    display: none;
+  }
+
+  .legalInfo span {
+    display: block;
+  }
+}
