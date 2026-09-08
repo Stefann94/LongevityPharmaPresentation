@@ -1,20 +1,33 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import styles from '../Account.module.css';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/client';
+import { useUtilizatorCurent } from '../useUtilizatorCurent';
 
-export default async function ReviewsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export default function ReviewsPage() {
+  const { user } = useUtilizatorCurent();
+  const [reviews, setReviews] = useState<any[]>([]);
 
-  if (!user) return <div>Neautorizat</div>;
+  useEffect(() => {
+    if (!user) return;
 
-  const { data: reviews } = await supabase
-    .from('reviews')
-    .select('*')
-    .eq('user_id', user.id);
+    const supabase = createClient();
+    let activ = true;
 
-  const hasReviews = reviews && reviews.length > 0;
+    supabase.from('reviews').select('*').eq('user_id', user.id).then(({ data }) => {
+      if (activ) setReviews(data ?? []);
+    });
 
+    return () => {
+      activ = false;
+    };
+  }, [user]);
+
+  // Layout-ul de cont nu randeaza continutul pana nu stie cine e utilizatorul.
+  if (!user) return null;
+
+  const hasReviews = reviews.length > 0;
   return (
     <div>
       <h2 className={styles.heroTitle} style={{ marginBottom: '30px' }}>Recenziile <strong>mele</strong></h2>

@@ -1,21 +1,34 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import styles from '../Account.module.css';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/client';
+import { useUtilizatorCurent } from '../useUtilizatorCurent';
 import NewsletterSwitch from './NewsletterSwitch';
 
-export default async function NewsletterPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export default function NewsletterPage() {
+  const { user } = useUtilizatorCurent();
+  const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
 
-  if (!user) return <div>Neautorizat</div>;
+  useEffect(() => {
+    if (!user) return;
 
-  const { data: subscription } = await supabase
-    .from('newsletter_subscriptions')
-    .select('is_subscribed')
-    .eq('user_id', user.id)
-    .single();
+    const supabase = createClient();
+    let activ = true;
 
-  const isSubscribed = subscription?.is_subscribed || false;
+    supabase
+      .from('newsletter_subscriptions')
+      .select('is_subscribed')
+      .eq('user_id', user.id)
+      .single()
+      .then(({ data: subscription }) => {
+        if (activ) setIsSubscribed(subscription?.is_subscribed || false);
+      });
+
+    return () => {
+      activ = false;
+    };
+  }, [user]);
 
   return (
     <div>
@@ -27,7 +40,9 @@ export default async function NewsletterPage() {
           Abonează-te pentru a primi cele mai noi articole despre longevitate, oferte exclusive și noutăți despre produsele noastre.
         </p>
 
-        <NewsletterSwitch initialSubscribed={isSubscribed} />
+        {/* Comutatorul reține starea inițială la prima randare, deci îl afișăm
+            abia după ce știm dacă utilizatorul este sau nu abonat. */}
+        {isSubscribed !== null && <NewsletterSwitch initialSubscribed={isSubscribed} />}
       </div>
     </div>
   );

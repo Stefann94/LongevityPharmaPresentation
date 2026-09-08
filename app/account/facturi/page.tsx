@@ -1,20 +1,33 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import styles from '../Account.module.css';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/client';
+import { useUtilizatorCurent } from '../useUtilizatorCurent';
 
-export default async function InvoicesPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export default function InvoicesPage() {
+  const { user } = useUtilizatorCurent();
+  const [invoices, setInvoices] = useState<any[]>([]);
 
-  if (!user) return <div>Neautorizat</div>;
+  useEffect(() => {
+    if (!user) return;
 
-  const { data: invoices } = await supabase
-    .from('invoices')
-    .select('*')
-    .eq('user_id', user.id);
+    const supabase = createClient();
+    let activ = true;
 
-  const hasInvoices = invoices && invoices.length > 0;
+    supabase.from('invoices').select('*').eq('user_id', user.id).then(({ data }) => {
+      if (activ) setInvoices(data ?? []);
+    });
 
+    return () => {
+      activ = false;
+    };
+  }, [user]);
+
+  // Layout-ul de cont nu randeaza continutul pana nu stie cine e utilizatorul.
+  if (!user) return null;
+
+  const hasInvoices = invoices.length > 0;
   return (
     <div>
       <h2 className={styles.heroTitle} style={{ marginBottom: '30px' }}>Istoric <strong>facturi</strong></h2>

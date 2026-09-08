@@ -1,35 +1,60 @@
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import styles from './Account.module.css';
+import { useUtilizatorCurent } from './useUtilizatorCurent';
 
-export default async function AccountPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+type Address = {
+  id: string;
+  type: string;
+  street: string;
+  city: string;
+  country: string;
+};
 
-  if (!user) {
-    redirect('/login');
-  }
+export default function AccountPage() {
+  const { user } = useUtilizatorCurent();
+
+  const [defaultShipping, setDefaultShipping] = useState<Address | null>(null);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const supabase = createClient();
+    let activ = true;
+
+    // Aceleași două interogări ca înainte, rulate acum din browser.
+    // Politicile RLS le filtrează după `auth.uid()`, deci fiecare client
+    // primește exact rândurile lui.
+    Promise.all([
+      supabase.from('addresses').select('*').eq('user_id', user.id),
+      supabase
+        .from('newsletter_subscriptions')
+        .select('is_subscribed')
+        .eq('user_id', user.id)
+        .single(),
+    ]).then(([{ data: addresses }, { data: newsletter }]) => {
+      if (!activ) return;
+      setDefaultShipping((addresses as Address[] | null)?.find(a => a.type === 'shipping') ?? null);
+      setIsSubscribed(newsletter?.is_subscribed || false);
+    });
+
+    return () => {
+      activ = false;
+    };
+  }, [user]);
+
+  // Layout-ul de cont nu randează conținutul până nu știe cine e utilizatorul,
+  // deci aici `user` este deja disponibil. Verificarea rămâne pentru TypeScript.
+  if (!user) return null;
 
   // Obținem informații adiționale
-  const firstName = user?.user_metadata?.first_name || '';
-  const lastName = user?.user_metadata?.last_name || '';
+  const firstName = user.user_metadata?.first_name || '';
+  const lastName = user.user_metadata?.last_name || '';
   const fullName = `${firstName} ${lastName}`.trim();
-  const email = user?.email || '';
-
-  // 1. Fetch addresses
-  const { data: addresses } = await supabase
-    .from('addresses')
-    .select('*')
-    .eq('user_id', user.id);
-  const defaultShipping = addresses?.find(a => a.type === 'shipping');
-
-  // 2. Fetch newsletter status
-  const { data: newsletter } = await supabase
-    .from('newsletter_subscriptions')
-    .select('is_subscribed')
-    .eq('user_id', user.id)
-    .single();
-  const isSubscribed = newsletter?.is_subscribed || false;
+  const email = user.email || '';
 
   return (
     <div className={styles.contentArea}>

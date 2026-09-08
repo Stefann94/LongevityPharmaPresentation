@@ -1,34 +1,47 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import styles from '../Account.module.css';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/client';
+import { useUtilizatorCurent } from '../useUtilizatorCurent';
 import ProfileForm from './ProfileForm';
 
-export default async function PersonalInfoPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+type DateProfil = { first_name: string; last_name: string; email: string; phone: string };
 
-  if (!user) {
-    return <div>Neautorizat</div>;
-  }
+export default function PersonalInfoPage() {
+  const { user } = useUtilizatorCurent();
+  const [initialData, setInitialData] = useState<DateProfil | null>(null);
 
-  // Fetch from profiles
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+  useEffect(() => {
+    if (!user) return;
 
-  const initialData = {
-    first_name: profile?.first_name || user.user_metadata?.first_name || '',
-    last_name: profile?.last_name || user.user_metadata?.last_name || '',
-    email: user.email || '',
-    phone: profile?.phone || '',
-  };
+    const supabase = createClient();
+    let activ = true;
+
+    supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+      .then(({ data: profile }) => {
+        if (!activ) return;
+        setInitialData({
+          first_name: profile?.first_name || user.user_metadata?.first_name || '',
+          last_name: profile?.last_name || user.user_metadata?.last_name || '',
+          email: user.email || '',
+          phone: profile?.phone || '',
+        });
+      });
+
+    return () => {
+      activ = false;
+    };
+  }, [user]);
 
   return (
     <div>
       <h2 className={styles.heroTitle} style={{ marginBottom: '30px' }}>Informații <strong>cont</strong></h2>
-      <ProfileForm initialData={initialData} />
+      {initialData && <ProfileForm initialData={initialData} />}
     </div>
   );
 }
