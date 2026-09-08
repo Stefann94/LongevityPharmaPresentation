@@ -1,6 +1,18 @@
-'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/client'
+
+/**
+ * Operatiuni pe datele utilizatorului, mutate din server in browser.
+ *
+ * Fisierul era marcat cu directiva de actiuni de server, care nu exista in
+ * export static: nu ramane niciun server Node care sa le execute. Fiind doar
+ * apeluri Supabase, ruleaza la fel de bine direct din browser - politicile RLS
+ * filtreaza dupa auth.uid(), deci fiecare client vede si modifica strict
+ * randurile lui.
+ *
+ * Semnaturile si valorile returnate sunt neschimbate, deci componentele care
+ * apeleaza aceste functii nu au avut nevoie de nicio modificare.
+ */
 
 // Tipul returnat de fetchCart. `notAuthenticated` era deja citit în CartContext,
 // dar nu apărea în tipul inferat — de aici eroarea de compilare.
@@ -11,7 +23,7 @@ type FetchCartResult = {
 }
 
 export async function fetchCart(): Promise<FetchCartResult> {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) return { items: [], error: 'Not authenticated' }
@@ -53,7 +65,7 @@ export async function fetchCart(): Promise<FetchCartResult> {
 }
 
 export async function addToCartDB(productSlug: string, price: number, quantity: number = 1) {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) return { error: 'Trebuie să fii autentificat pentru a adăuga în coș.', notAuthenticated: true }
@@ -99,7 +111,7 @@ export async function addToCartDB(productSlug: string, price: number, quantity: 
 }
 
 export async function removeCartItemDB(productSlug: string) {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) return { error: 'Not authenticated', notAuthenticated: true }
@@ -115,7 +127,7 @@ export async function removeCartItemDB(productSlug: string) {
 }
 
 export async function updateCartItemQuantityDB(productSlug: string, quantity: number) {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) return { error: 'Not authenticated', notAuthenticated: true }
@@ -137,7 +149,7 @@ export async function updateCartItemQuantityDB(productSlug: string, quantity: nu
 export async function fetchProductsDetailsBySlugs(slugs: string[]) {
   if (!slugs || slugs.length === 0) return [];
   
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data: products } = await supabase
     .from('products')
     .select('slug, name, image_url, price')

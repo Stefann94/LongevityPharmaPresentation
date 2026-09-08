@@ -1,10 +1,21 @@
-'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
+import { createClient } from '@/lib/supabase/client'
+
+/**
+ * Modificarile din contul clientului, mutate din server in browser.
+ *
+ * Erau actiuni de server, inexistente in export static. Fiind doar apeluri
+ * Supabase, ruleaza direct din browser; RLS filtreaza dupa auth.uid().
+ *
+ * Apelurile revalidatePath au fost scoase: nu mai exista server care sa
+ * reconstruiasca pagini. Nu se pierde nimic - paginile de cont isi citesc
+ * datele la fiecare afisare, deci raman la zi oricum.
+ *
+ * Semnaturile si valorile returnate sunt neschimbate.
+ */
 
 export async function updateProfile(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) {
@@ -38,14 +49,12 @@ export async function updateProfile(formData: FormData) {
 
   if (profileError) return { error: profileError.message }
 
-  revalidatePath('/account/informatii')
-  revalidatePath('/account') // Also revalidate dashboard to reflect name changes
   
   return { success: true }
 }
 
 export async function toggleNewsletter(isSubscribed: boolean) {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) return { error: 'Not authenticated' }
@@ -64,13 +73,11 @@ export async function toggleNewsletter(isSubscribed: boolean) {
     return { error: error.message }
   }
 
-  revalidatePath('/account/newsletter')
-  revalidatePath('/account')
   return { success: true }
 }
 
 export async function updateMedicalProfile(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) return { error: 'Not authenticated' }
@@ -92,12 +99,11 @@ export async function updateMedicalProfile(formData: FormData) {
     return { error: error.message }
   }
 
-  revalidatePath('/account/medical')
   return { success: true }
 }
 
 export async function updateAddress(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) return { error: 'Not authenticated' }
@@ -159,7 +165,5 @@ export async function updateAddress(formData: FormData) {
     }
   }
 
-  revalidatePath('/account/adrese')
-  revalidatePath('/account') // Update dashboard
   return { success: true }
 }

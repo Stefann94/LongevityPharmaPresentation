@@ -1,9 +1,23 @@
-'use server'
-
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/client'
 import type { SupabaseClient } from '@supabase/supabase-js'
+
+/**
+ * Autentificarea, mutată din server în browser.
+ *
+ * Fișierul era marcat ca acțiuni de server și folosea `revalidatePath` și
+ * `redirect` din Next.js. Niciuna nu există în export static: nu mai rămâne un
+ * server care să reconstruiască pagini sau să trimită un răspuns de
+ * redirecționare.
+ *
+ * Înlocuitorul este `window.location.assign('/')` — o reîncărcare completă a
+ * paginii. Efectul este chiar cel dorit: tot ce ține de sesiune (antetul,
+ * coșul, favoritele) pornește de la zero cu noua stare, exact ce obținea
+ * înainte `revalidatePath('/', 'layout')`.
+ *
+ * Semnăturile rămân neschimbate — întorc `{ error }` la eșec și navighează la
+ * reușită — deci paginile de login și signup, antetul și bara de cont nu au
+ * avut nevoie de nicio modificare.
+ */
 
 /**
  * Leagă de contul tocmai autentificat comenzile plasate fără cont cu același
@@ -23,7 +37,8 @@ async function claimGuestOrders(supabase: SupabaseClient) {
     }
     if (data) {
       console.log(`[COMENZI] ${data} comanda/comenzi legate de cont.`)
-      revalidatePath('/account/comenzi')
+      // Fără revalidatePath: pagina de comenzi își citește singură datele din
+      // browser, iar reîncărcarea de mai jos o va aduce oricum la zi.
     }
   } catch (err) {
     console.warn('Revendicarea comenzilor fara cont a esuat:', err)
@@ -31,7 +46,7 @@ async function claimGuestOrders(supabase: SupabaseClient) {
 }
 
 export async function login(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = createClient()
 
   // Extract email/phone and password.
   // Currently, the form asks for "E-mail sau Număr de telefon", but Supabase signInWithPassword primarily uses email.
@@ -67,12 +82,11 @@ export async function login(formData: FormData) {
   // pot fi legate acum de el.
   await claimGuestOrders(supabase)
 
-  revalidatePath('/', 'layout')
-  redirect('/')
+  window.location.assign('/')
 }
 
 export async function signup(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = createClient()
 
   const email = formData.get('email') as string
   const password = formData.get('password') as string
@@ -132,25 +146,18 @@ export async function signup(formData: FormData) {
     return { error: 'Acest e-mail este deja înregistrat.' }
   }
 
-  // After successful signup, redirect to home page or a confirmation page
-  // Note: if email confirmation is enabled on Supabase, the user session won't be established here.
-
   // Contul tocmai creat poate prelua comenzile plasate anterior cu același
   // email. Dacă înregistrarea cere confirmare pe email, aici nu există încă
   // sesiune, apelul nu face nimic, iar comenzile vor fi preluate la prima
   // autentificare — de aceea revendicarea stă și în `login`.
   await claimGuestOrders(supabase)
 
-  // `redirect` semnalează redirecționarea aruncând o excepție pe care Next o
-  // tratează intern, deci trebuie să rămână în afara oricărui try/catch.
-  revalidatePath('/', 'layout')
-  redirect('/')
+  window.location.assign('/')
 }
 
 export async function logout() {
-  const supabase = await createClient()
+  const supabase = createClient()
   await supabase.auth.signOut()
-  
-  revalidatePath('/', 'layout')
-  redirect('/')
+
+  window.location.assign('/')
 }

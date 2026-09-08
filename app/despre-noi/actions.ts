@@ -1,6 +1,18 @@
-'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/client';
+
+/**
+ * Operatiuni pe datele utilizatorului, mutate din server in browser.
+ *
+ * Fisierul era marcat cu directiva de actiuni de server, care nu exista in
+ * export static: nu ramane niciun server Node care sa le execute. Fiind doar
+ * apeluri Supabase, ruleaza la fel de bine direct din browser - politicile RLS
+ * filtreaza dupa auth.uid(), deci fiecare client vede si modifica strict
+ * randurile lui.
+ *
+ * Semnaturile si valorile returnate sunt neschimbate, deci componentele care
+ * apeleaza aceste functii nu au avut nevoie de nicio modificare.
+ */
 
 export type AboutUsSection = {
   id: string;
@@ -12,7 +24,7 @@ export type AboutUsSection = {
 };
 
 export async function getAboutUsContent(): Promise<AboutUsSection[]> {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data, error } = await supabase
     .from('about_us_content')
     .select('*')

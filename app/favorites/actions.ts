@@ -1,10 +1,21 @@
-'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
+import { createClient } from '@/lib/supabase/client'
+
+/**
+ * Operatiuni pe datele utilizatorului, mutate din server in browser.
+ *
+ * Fisierul era marcat cu directiva de actiuni de server, care nu exista in
+ * export static: nu ramane niciun server Node care sa le execute. Fiind doar
+ * apeluri Supabase, ruleaza la fel de bine direct din browser - politicile RLS
+ * filtreaza dupa auth.uid(), deci fiecare client vede si modifica strict
+ * randurile lui.
+ *
+ * Semnaturile si valorile returnate sunt neschimbate, deci componentele care
+ * apeleaza aceste functii nu au avut nevoie de nicio modificare.
+ */
 
 export async function fetchFavorites() {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) return { items: [] }
@@ -47,7 +58,7 @@ export async function fetchFavorites() {
 }
 
 export async function toggleFavoriteDB(productSlug: string) {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
   // Indicatorul explicit evită verificarea după textul erorii — același
