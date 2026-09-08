@@ -1,6 +1,5 @@
 import React from 'react'
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { createStaticClient } from '@/lib/supabase/static'
 import CartClient from './CartClient'
 import ProductCarousel from '@/components/ProductCarousel'
 import styles from './Cart.module.css'
@@ -10,14 +9,18 @@ export const metadata = {
   description: 'Coșul tău de cumpărături Longevity Farma',
 }
 
+/**
+ * Pagina cere doar produsele recomandate, care sunt aceleași pentru oricine,
+ * deci se citesc o singură dată, la build.
+ *
+ * Sesiunea era citită aici, dar nu era folosită nicăieri: coșul funcționează
+ * și pentru vizitatori, iar conținutul lui este gestionat integral de
+ * CartClient, în browser. Apelul a fost scos - era singurul lucru care forța
+ * randarea la cerere.
+ */
 export default async function CartPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = createStaticClient()
 
-  // We allow guests now, so no redirect here
-
-
-  // Fetch Recommended Products for the Carousel below the cart
   const { data: recommendedProducts } = await supabase
     .from('products')
     .select('id, name, slug, image_url, price')
