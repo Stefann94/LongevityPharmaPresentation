@@ -1,7 +1,11 @@
-'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
+import { createClient } from '@/lib/supabase/client'
+
+/**
+ * Abonarea ruleaza acum din browser: sunt doar apeluri Supabase, iar
+ * revalidatePath nu are corespondent fara server. Panoul din cont isi citeste
+ * oricum starea la fiecare afisare, deci ramane la zi.
+ */
 
 /**
  * Abonare la newsletter din subsolul site-ului.
@@ -21,7 +25,7 @@ export async function subscribeToNewsletter(formData: FormData) {
     return { error: 'Adresa de e-mail nu pare validă.' }
   }
 
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   // Pentru un utilizator autentificat folosim exact aceeași operație ca
@@ -45,7 +49,6 @@ export async function subscribeToNewsletter(formData: FormData) {
       return { error: 'Nu am putut salva abonarea. Te rugăm să încerci din nou.' }
     }
 
-    revalidatePath('/account/newsletter')
     return { success: true }
   }
 

@@ -1,7 +1,13 @@
-'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
+import { createClient } from '@/lib/supabase/client'
+
+/**
+ * Finalizarea comenzii, mutata din server in browser.
+ *
+ * Verificarea preturilor a ramas neschimbata si este in continuare esentiala:
+ * preturile se recitesc din tabela `products` dupa slug, deci o valoare
+ * modificata in cosul din browser nu are niciun efect asupra sumei facturate.
+ */
 
 // Forma unui produs așa cum vine din coșul clientului (localStorage sau context).
 // Adnotare pură de tip: TypeScript o șterge la compilare, codul executat nu se schimbă.
@@ -13,7 +19,7 @@ type ClientCartItem = {
 }
 
 export async function processCheckout(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   // 1. Get cart items from form data (JSON string passed from client)
@@ -156,69 +162,26 @@ export async function processCheckout(formData: FormData) {
       .eq('user_id', user.id)
   }
 
-  // 7. Revalidate paths
-  revalidatePath('/cart')
-  revalidatePath('/account/comenzi')
-
-  // 8. Send Email using Resend
+  // 7. Confirmarea pe email
+  //
+  // Emailul era trimis aici, direct cu Resend. Nu mai este posibil: codul
+  // ruleaza acum in browser, iar RESEND_API_KEY ar ajunge vizibila oricui.
+  // Trimiterea s-a mutat in functia Edge `trimite-email`, care ruleaza pe
+  // infrastructura Supabase si tine cheia in variabile de mediu.
+  //
+  // Ii dam doar identificatorul comenzii. Functia citeste singura randul din
+  // `orders` si deduce destinatarul - din `guest_email` pentru vizitatori, din
+  // contul utilizatorului pentru clientii autentificati. Adresa nu vine
+  // niciodata de la apelant, deci functia nu poate fi folosita ca releu de spam.
+  //
+  // Esecul este intentionat inghitit: comanda este deja salvata, iar un email
+  // care nu pleaca nu trebuie sa transforme o comanda reusita in eroare.
   try {
-    const { Resend } = require('resend');
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    
-    // Generăm lista de produse formatată HTML
-    const itemsHtml = orderItemsData.map(item => `
-      <tr>
-        <td style="padding: 10px; border-bottom: 1px solid #ddd;">${item.product_name}</td>
-        <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
-        <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">${item.price_at_time} Lei</td>
-      </tr>
-    `).join('');
-
-    const emailHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #2e8b57;">Confirmare Comandă Longevity Farma</h2>
-        <p>Salut, <strong>${firstName}</strong>!</p>
-        <p>Îți mulțumim pentru comandă. Mai jos regăsești detaliile cumpărăturilor tale:</p>
-        
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-          <thead>
-            <tr style="background-color: #f8f9fa;">
-              <th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Produs</th>
-              <th style="padding: 10px; text-align: center; border-bottom: 2px solid #ddd;">Cantitate</th>
-              <th style="padding: 10px; text-align: right; border-bottom: 2px solid #ddd;">Preț/buc</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${itemsHtml}
-          </tbody>
-        </table>
-        
-        <p style="text-align: right; font-size: 16px;">Transport: <strong>${shippingCost === 0 ? 'GRATUIT' : shippingCost + ' Lei'}</strong></p>
-        <h3 style="text-align: right; color: #1a2b22;">Total: ${finalTotal.toFixed(2)} Lei</h3>
-        
-        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 30px;">
-          <h4 style="margin-top: 0; color: #333;">Adresa de livrare:</h4>
-          <p style="margin: 0; color: #555;">${fullAddress}</p>
-          <p style="margin: 5px 0 0 0; color: #555;">Telefon: ${phone}</p>
-        </div>
-      </div>
-    `;
-
-    const { data: emailData, error: emailError } = await resend.emails.send({
-      from: 'Longevity Farma <onboarding@resend.dev>',
-      to: [email],
-      subject: `Confirmare Comandă #${orderId.split('-')[0]} - Longevity Farma`,
-      html: emailHtml,
-    });
-
-    if (emailError) {
-      console.error('Eroare la trimitere email:', emailError);
-    } else {
-      console.log(`[EMAIL] Trimis cu succes către ${email}:`, emailData);
-    }
+    await supabase.functions.invoke('trimite-email', {
+      body: { tip: 'comanda', id: orderId },
+    })
   } catch (err) {
-    console.error('Eroare generală email:', err);
+    console.error('Emailul de confirmare nu a putut fi trimis:', err)
   }
-
   return { success: true }
 }
