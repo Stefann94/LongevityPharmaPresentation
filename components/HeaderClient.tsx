@@ -23,22 +23,27 @@ interface HeaderClientProps {
 }
 
 /**
- * Mărimea sumei din butonul coșului, în funcție de cât de lung este textul.
+ * Mărimea sumei din butonul coșului, în funcție de câte cifre are.
  *
  * Butonul are lățime fixă, ca bara de iconițe din dreapta să nu se miște
- * niciodată. Totalurile obișnuite (până la „999.99 RON") încap la mărimea
- * normală; peste ele se micșorează scrisul, în loc să crească butonul.
+ * niciodată. Micșorarea intervine doar la sume neobișnuit de mari, ca text
+ * de rezervă — nu ca soluție pentru totaluri normale.
  *
- * Pragurile sunt pe lungimea șirului, nu pe lățimea măsurată în browser:
+ * Primește DOAR partea numerică, fără monedă. „RON" este scris separat, mai
+ * mic, deci nu mai influențează decizia. Varianta anterioară primea textul
+ * întreg și presupunea că „RON" ocupă cât „Lei", fiindcă au același număr de
+ * caractere — greșit: trei majuscule sunt vizibil mai late decât o majusculă
+ * și două minuscule, iar totalurile de patru cifre ieșeau înghesuite.
+ *
+ * Pragurile sunt pe numărul de caractere, nu pe lățimea măsurată în browser:
  * cifrele folosesc `tabular-nums`, deci au toate aceeași lățime, iar rezultatul
  * este identic fără să fie nevoie de vreo măsurătoare și de un reflow.
  */
-function cartTotalFontSize(text: string): string | undefined {
-  // „RON" are exact aceeași lungime ca vechiul „Lei", deci pragurile de mai
-  // jos rămân valabile după schimbarea monedei afișate.
-  if (text.length >= 12) return '0.76rem'; // de la 10.000 RON în sus
-  if (text.length >= 11) return '0.86rem'; // 1.000 – 9.999 RON
-  return undefined;                        // mărimea din CSS
+function cartTotalFontSize(numar: string): string | undefined {
+  if (numar.length >= 9) return '0.76rem';  // de la 100.000 în sus
+  if (numar.length >= 8) return '0.82rem';  // 10.000 – 99.999
+  if (numar.length >= 7) return '0.88rem';  // 1.000 – 9.999
+  return undefined;                         // mărimea din CSS
 }
 
 // Linkurile din bara de sub antet. Pe desktop apar în `.bottomMenu`; pe
@@ -484,13 +489,14 @@ export default function HeaderClient({ categories, featuredProducts, activePromo
                       {cartCount > 0 && <span className={styles.cartBadge}>{cartCount}</span>}
                     </div>
                     {(() => {
-                      const totalText = `${cartTotal.toFixed(2)} RON`;
+                      const numar = cartTotal.toFixed(2);
                       return (
                         <span
                           className={styles.cartTotal}
-                          style={{ fontSize: cartTotalFontSize(totalText) }}
+                          style={{ fontSize: cartTotalFontSize(numar) }}
                         >
-                          {totalText}
+                          {numar}
+                          <span className={styles.cartCurrency}>RON</span>
                         </span>
                       );
                     })()}
