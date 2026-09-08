@@ -7,10 +7,15 @@
 --
 --  CE A RAMAS, AICI
 --  Brandul apare si in continutul din baza de date, care nu tine de cod:
---    - products.brand          19 randuri cu "LongevityFarma"
---    - journal_articles        6 aparitii, in coloanele `author` si `content`
---    - about_us_content        necunoscut: tabelul e protejat de RLS si nu a
---                              putut fi verificat din exterior
+--  Lista de mai jos este rezultatul cautarii din pasul 1, rulata pe baza reala:
+--    - products.brand                  19 randuri cu "LongevityFarma"
+--    - journal_articles.author          4 randuri
+--    - journal_articles.content         2 randuri
+--    - calitate_content.description     1 rand
+--
+--  `calitate_content` nu fusese anticipat: tabelul este protejat de RLS si nu
+--  putea fi vazut din exterior. De aceea pasul 1 cauta singur prin toate
+--  coloanele de text, in loc sa se bazeze pe o lista scrisa de mana.
 --
 --  ATENTIE — CE NU SE ATINGE
 --  In texte exista cuvintele romanesti "farmacie", "farmaciile" si
@@ -74,6 +79,11 @@ update public.products
    set brand = replace(brand, 'Farma', 'Pharma')
  where brand like '%Farma%';
 
+-- Textul de pe pagina "Calitate" — gasit de cautarea din pasul 1
+update public.calitate_content
+   set description = replace(description, 'Farma', 'Pharma')
+ where description like '%Farma%';
+
 -- Articolele din jurnal: numele autorului si textul articolului
 update public.journal_articles
    set author  = replace(author,  'Farma', 'Pharma'),
@@ -94,6 +104,10 @@ select count(*) as produse_ramase_cu_brandul_vechi
 select count(*) as articole_ramase_cu_brandul_vechi
   from public.journal_articles
  where author like '%Farma%' or content like '%Farma%';
+
+select count(*) as calitate_ramas_cu_brandul_vechi
+  from public.calitate_content
+ where description like '%Farma%';
 
 -- Marcile existente dupa modificare — "LongevityPharma" trebuie sa apara cu 19:
 select brand, count(*) as bucati
