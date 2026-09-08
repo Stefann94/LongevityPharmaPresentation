@@ -9,7 +9,6 @@ export const metadata = {
   description: 'Informații susținute de știință despre medicină preventivă, anti-aging, ingrediente și protocoale de sănătate.',
 };
 
-export const revalidate = 60;
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('ro-RO', {

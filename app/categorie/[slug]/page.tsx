@@ -2,6 +2,17 @@ import { createStaticClient } from '@/lib/supabase/static';
 import { notFound } from "next/navigation";
 import CategoryClient from "./CategoryClient";
 
+// Cate o pagina pre-generata pentru fiecare categorie. Vezi comentariul din
+// app/produs/[slug]/page.tsx pentru motiv.
+export async function generateStaticParams() {
+  const supabase = createStaticClient();
+  const { data } = await supabase.from('categories').select('slug');
+  return (data ?? []).map((c: { slug: string }) => ({ slug: c.slug }));
+}
+
+export const dynamicParams = false;
+
+
 
 // Fără asta, toate cele 12 pagini de categorie moșteneau titlul și descrierea
 // din layout-ul principal — adică Google le vedea ca pagini identice.

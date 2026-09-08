@@ -6,8 +6,17 @@ import { getJournalArticleBySlug } from '../actions';
 import styles from './Article.module.css';
 import ProductSection from '@/components/ProductSection';
 import { createStaticClient } from '@/lib/supabase/static';
+import { getJournalArticles } from '../actions';
 
-export const revalidate = 60;
+// Cate o pagina pre-generata pentru fiecare articol din jurnal.
+export async function generateStaticParams() {
+  const articole = await getJournalArticles();
+  return articole.map((a) => ({ slug: a.slug }));
+}
+
+export const dynamicParams = false;
+
+
 
 // În Next 16, `params` este o promisiune și trebuie așteptată.
 // Citirea sincronă (`params.slug`) returna `undefined`, articolul nu era găsit

@@ -10,6 +10,20 @@ import FAQAccordion from './FAQAccordion';
 import AddToCartButton from '@/components/AddToCartButton';
 import FavoriteButton from '@/components/FavoriteButton';
 
+// Lista de produse se citeste o singura data, la build, si genereaza cate o
+// pagina HTML pentru fiecare. Fara asta, Next.js ar trebui sa randeze pagina
+// la fiecare cerere, pe un server Node - ceea ce gazduirea Hostico Start nu are.
+export async function generateStaticParams() {
+  const supabase = createStaticClient();
+  const { data } = await supabase.from('products').select('slug');
+  return (data ?? []).map((p: { slug: string }) => ({ slug: p.slug }));
+}
+
+// Un slug care nu exista la momentul build-ului returneaza 404, in loc sa fie
+// randat la cerere. Obligatoriu pentru export static.
+export const dynamicParams = false;
+
+
 // Generate Metadata for SEO
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
