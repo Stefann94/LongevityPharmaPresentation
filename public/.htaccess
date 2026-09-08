@@ -10,27 +10,42 @@
 # ---------------------------------------------------------------------------
 # Adrese fără .html
 # ---------------------------------------------------------------------------
-# Exportul produce `produse.html`, `contact.html` etc., dar linkurile din site
-# arată spre `/produse` și `/contact`. Fără regula asta, fiecare ar da 404.
+# Exportul produce, pentru fiecare pagină, DOUĂ lucruri cu același nume:
 #
-# Ordinea contează: dacă fișierul cerut există ca atare (o imagine, un fișier
-# JS), este servit direct; abia altfel se încearcă varianta cu `.html`.
+#   contact.html   pagina propriu-zisă
+#   contact/       un folder cu date interne, folosite la navigarea prin site
+#
+# Ordinea regulilor de mai jos este esențială, iar prima variantă a acestui
+# fișier o avea greșită. Dacă folderul e lăsat să treacă primul, Apache
+# redirecționează /contact către /contact/ și afișează lista fișierelor din
+# folder în locul paginii. Pagina trebuie deci verificată ÎNAINTEA folderului
+# cu același nume.
+
+# Nicio listare de fișiere, în niciun folder.
+# Dacă serverul răspunde cu eroare 500 după salvare, șterge linia asta: unele
+# configurații Apache nu permit directiva `Options` dintr-un fișier .htaccess.
+Options -Indexes
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # Nu rescriem cereri către fișiere sau directoare care chiar există
-  RewriteCond %{REQUEST_FILENAME} -f [OR]
-  RewriteCond %{REQUEST_FILENAME} -d
+  # 1. Fișierele care există exact așa se servesc direct: CSS, JavaScript,
+  #    imagini, fonturi. Nu li se aplică nicio rescriere.
+  RewriteCond %{REQUEST_FILENAME} -f
   RewriteRule ^ - [L]
 
-  # /produse -> produse.html
+  # 2. /contact -> contact.html
+  #    Are prioritate față de folderul cu același nume. Fiindcă rescrierea se
+  #    face aici, Apache nu mai ajunge să vadă un folder și nu mai adaugă bara
+  #    finală la adresă.
   RewriteCond %{REQUEST_FILENAME}.html -f
   RewriteRule ^(.*)$ $1.html [L]
 
-  # /produs/magneziu/ -> produs/magneziu.html
-  RewriteCond %{REQUEST_FILENAME} !-d
+  # 3. /contact/ -> contact.html
+  #    Pentru cine ajunge cu bară finală dintr-un link vechi sau din istoricul
+  #    browserului. Redirecționare permanentă, ca adresa să rămână una singură.
   RewriteCond %{DOCUMENT_ROOT}/$1.html -f
-  RewriteRule ^(.*)/$ /$1.html [L,R=301]
+  RewriteRule ^(.+)/$ /$1.html [L,R=301]
 </IfModule>
 
 # Pagina de eroare generată de Next.js
