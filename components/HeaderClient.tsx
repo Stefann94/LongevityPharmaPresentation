@@ -26,7 +26,7 @@ interface HeaderClientProps {
  * Mărimea sumei din butonul coșului, în funcție de cât de lung este textul.
  *
  * Butonul are lățime fixă, ca bara de iconițe din dreapta să nu se miște
- * niciodată. Totalurile obișnuite (până la „999.99 Lei") încap la mărimea
+ * niciodată. Totalurile obișnuite (până la „999.99 RON") încap la mărimea
  * normală; peste ele se micșorează scrisul, în loc să crească butonul.
  *
  * Pragurile sunt pe lungimea șirului, nu pe lățimea măsurată în browser:
@@ -34,8 +34,10 @@ interface HeaderClientProps {
  * este identic fără să fie nevoie de vreo măsurătoare și de un reflow.
  */
 function cartTotalFontSize(text: string): string | undefined {
-  if (text.length >= 12) return '0.76rem'; // de la 10.000 Lei în sus
-  if (text.length >= 11) return '0.86rem'; // 1.000 – 9.999 Lei
+  // „RON" are exact aceeași lungime ca vechiul „Lei", deci pragurile de mai
+  // jos rămân valabile după schimbarea monedei afișate.
+  if (text.length >= 12) return '0.76rem'; // de la 10.000 RON în sus
+  if (text.length >= 11) return '0.86rem'; // 1.000 – 9.999 RON
   return undefined;                        // mărimea din CSS
 }
 
@@ -372,7 +374,7 @@ export default function HeaderClient({ categories, featuredProducts, activePromo
                             </div>
                             <div className={styles.favItemInfo}>
                               <div className={styles.favItemName}>{item.name}</div>
-                              <div className={styles.favItemPrice}>{item.price} Lei</div>
+                              <div className={styles.favItemPrice}>{item.price} RON</div>
                             </div>
                             <button aria-label="Șterge de la favorite" onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(item.product_slug) }} style={{ alignSelf: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#999', zIndex: 2 }}>
                               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -482,7 +484,7 @@ export default function HeaderClient({ categories, featuredProducts, activePromo
                       {cartCount > 0 && <span className={styles.cartBadge}>{cartCount}</span>}
                     </div>
                     {(() => {
-                      const totalText = `${cartTotal.toFixed(2)} Lei`;
+                      const totalText = `${cartTotal.toFixed(2)} RON`;
                       return (
                         <span
                           className={styles.cartTotal}
@@ -527,7 +529,7 @@ export default function HeaderClient({ categories, featuredProducts, activePromo
                                     trebuie să oprească navigarea, la fel ca butonul de
                                     ștergere de mai jos. */}
                                 <div className={styles.favItemRow}>
-                                  <div className={styles.favItemPrice}>{item.price} Lei</div>
+                                  <div className={styles.favItemPrice}>{item.price} RON</div>
                                   <div className={styles.favItemQty}>
                                     <button
                                       type="button"
@@ -566,7 +568,7 @@ export default function HeaderClient({ categories, featuredProducts, activePromo
                         </div>
                         <div className={styles.favFooter}>
                           <div style={{ textAlign: 'center', marginBottom: '15px', fontSize: '1.05rem', color: '#222' }}>
-                            Total: <strong>{cartTotal.toFixed(2)} Lei</strong>
+                            Total: <strong>{cartTotal.toFixed(2)} RON</strong>
                           </div>
                           <Link href="/cart" className={styles.btnViewAllFavs} onClick={() => setIsCartOpen(false)}>
                             Vezi coșul
@@ -633,7 +635,7 @@ export default function HeaderClient({ categories, featuredProducts, activePromo
                           />
                           <div className={styles.searchResultInfo}>
                             <span className={styles.searchResultName}>{prod.name}</span>
-                            <span className={styles.searchResultPrice}>{prod.price} Lei</span>
+                            <span className={styles.searchResultPrice}>{prod.price} RON</span>
                           </div>
                         </Link>
                       ))

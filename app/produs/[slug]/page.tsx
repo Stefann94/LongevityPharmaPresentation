@@ -213,14 +213,14 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
             <div className={styles.priceBlock}>
               <span className={styles.price}>{product.price}</span>
-              <span className={styles.currency}> Lei</span>
+              <span className={styles.currency}> RON</span>
             </div>
 
             {/* INSTALLMENT BOX */}
             <div className={styles.installmentBox}>
               <div className={styles.installmentText}>
                 <span className={styles.installmentTitle}>Plătește în 4 rate egale</span>
-                <span className={styles.installmentSub}>de la {(product.price / 4).toFixed(2)} Lei / lună</span>
+                <span className={styles.installmentSub}>de la {(product.price / 4).toFixed(2)} RON / lună</span>
               </div>
               <span className={styles.installmentBadge}>0% Dobândă</span>
             </div>

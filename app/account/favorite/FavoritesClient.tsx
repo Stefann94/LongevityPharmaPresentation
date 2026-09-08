@@ -81,7 +81,7 @@ export default function FavoritesClient() {
                 <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#333', marginBottom: '10px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{product.name}</h3>
               </Link>
               <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--color-primary)' }}>{product.price} Lei</span>
+                <span style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--color-primary)' }}>{product.price} RON</span>
                 <RemoveFavoriteButton productSlug={product.product_slug} productName={product.name} />
               </div>
             </div>

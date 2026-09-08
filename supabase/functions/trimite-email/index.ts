@@ -65,7 +65,7 @@ async function trimitePrinResend(mesaj: {
     return { trimis: false, motiv: 'lipseste RESEND_API_KEY' };
   }
 
-  const expeditor = Deno.env.get('EMAIL_EXPEDITOR') ?? 'Longevity Farma <onboarding@resend.dev>';
+  const expeditor = Deno.env.get('EMAIL_EXPEDITOR') ?? 'Longevity Pharma <onboarding@resend.dev>';
 
   const raspunsResend = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -223,18 +223,18 @@ Deno.serve(async (req) => {
       <tr>
         <td style="padding: 10px; border-bottom: 1px solid #ddd;">${escapeHtml(item.product_name)}</td>
         <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
-        <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">${item.price_at_time} Lei</td>
+        <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">${item.price_at_time} RON</td>
       </tr>
     `
       )
       .join('');
 
     const prenume = escapeHtml(String(comanda.shipping_name ?? '').split(' ')[0]);
-    const transport = Number(comanda.shipping_cost) === 0 ? 'GRATUIT' : `${comanda.shipping_cost} Lei`;
+    const transport = Number(comanda.shipping_cost) === 0 ? 'GRATUIT' : `${comanda.shipping_cost} RON`;
 
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #2e8b57;">Confirmare Comandă Longevity Farma</h2>
+        <h2 style="color: #2e8b57;">Confirmare Comandă Longevity Pharma</h2>
         <p>Salut, <strong>${prenume}</strong>!</p>
         <p>Îți mulțumim pentru comandă. Mai jos regăsești detaliile cumpărăturilor tale:</p>
 
@@ -252,7 +252,7 @@ Deno.serve(async (req) => {
         </table>
 
         <p style="text-align: right; font-size: 16px;">Transport: <strong>${transport}</strong></p>
-        <h3 style="text-align: right; color: #1a2b22;">Total: ${Number(comanda.total_amount).toFixed(2)} Lei</h3>
+        <h3 style="text-align: right; color: #1a2b22;">Total: ${Number(comanda.total_amount).toFixed(2)} RON</h3>
 
         <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 30px;">
           <h4 style="margin-top: 0; color: #333;">Adresa de livrare:</h4>
@@ -264,7 +264,7 @@ Deno.serve(async (req) => {
 
     const rezultat = await trimitePrinResend({
       to: destinatar,
-      subject: `Confirmare Comandă #${String(comanda.id).split('-')[0]} - Longevity Farma`,
+      subject: `Confirmare Comandă #${String(comanda.id).split('-')[0]} - Longevity Pharma`,
       html,
     });
 

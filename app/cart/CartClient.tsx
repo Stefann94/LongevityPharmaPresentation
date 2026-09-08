@@ -64,7 +64,7 @@ export default function CartClient() {
               </div>
             ) : (
               <div className={styles.freeShippingText}>
-                Mai adaugă produse de <span>{amountToFreeShipping.toFixed(2)} Lei</span> pentru <span>livrare gratuită!</span>
+                Mai adaugă produse de <span>{amountToFreeShipping.toFixed(2)} RON</span> pentru <span>livrare gratuită!</span>
               </div>
             )}
             
@@ -76,7 +76,7 @@ export default function CartClient() {
             </div>
             
             <div className={styles.deliveryCostText}>
-              Cost livrare: {isFreeShipping ? <span>GRATUIT</span> : `${STANDARD_SHIPPING_COST} Lei`}
+              Cost livrare: {isFreeShipping ? <span>GRATUIT</span> : `${STANDARD_SHIPPING_COST} RON`}
             </div>
           </div>
 
@@ -120,7 +120,7 @@ export default function CartClient() {
 
                 <div className={styles.itemPriceSection}>
                   <div className={styles.itemPrice}>
-                    {item.price.toFixed(2)} Lei
+                    {item.price.toFixed(2)} RON
                   </div>
                   
                   <div className={styles.quantityControl}>
@@ -151,17 +151,17 @@ export default function CartClient() {
           
           <div className={styles.summaryRow}>
             <span>Cost produse:</span>
-            <span>{cartTotal.toFixed(2)} Lei</span>
+            <span>{cartTotal.toFixed(2)} RON</span>
           </div>
           <div className={styles.summaryRow}>
             <span>Cost livrare:</span>
-            <span>{isFreeShipping ? <span className={styles.freeText}>GRATUIT</span> : `${STANDARD_SHIPPING_COST} Lei`}</span>
+            <span>{isFreeShipping ? <span className={styles.freeText}>GRATUIT</span> : `${STANDARD_SHIPPING_COST} RON`}</span>
           </div>
           
           <div className={`${styles.summaryRow} ${styles.total}`}>
             <div className={styles.totalRowInner}>
               <span>Total:</span>
-              <span>{finalTotal.toFixed(2)} Lei</span>
+              <span>{finalTotal.toFixed(2)} RON</span>
             </div>
           </div>
 

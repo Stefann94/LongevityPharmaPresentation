@@ -131,7 +131,7 @@ export default function CheckoutClient({ profile, address }: CheckoutClientProps
             {cartItems.map(item => (
               <div key={item.id} className={styles.summaryItem}>
                 <span className={styles.itemName}>{item.quantity}x {item.name || 'Produs'}</span>
-                <span className={styles.itemPrice}>{(item.price * item.quantity).toFixed(2)} Lei</span>
+                <span className={styles.itemPrice}>{(item.price * item.quantity).toFixed(2)} RON</span>
               </div>
             ))}
           </div>
@@ -140,17 +140,17 @@ export default function CheckoutClient({ profile, address }: CheckoutClientProps
 
           <div className={styles.totalsRow}>
             <span>Subtotal:</span>
-            <span>{itemsTotal.toFixed(2)} Lei</span>
+            <span>{itemsTotal.toFixed(2)} RON</span>
           </div>
-          
+
           <div className={styles.totalsRow}>
             <span>Transport:</span>
-            <span>{shippingCost === 0 ? <span className={styles.freeText}>GRATUIT</span> : `${shippingCost} Lei`}</span>
+            <span>{shippingCost === 0 ? <span className={styles.freeText}>GRATUIT</span> : `${shippingCost} RON`}</span>
           </div>
 
           <div className={`${styles.totalsRow} ${styles.grandTotal}`}>
             <span>Total de plată:</span>
-            <span>{finalTotal.toFixed(2)} Lei</span>
+            <span>{finalTotal.toFixed(2)} RON</span>
           </div>
 
           {errorMsg && (

@@ -153,7 +153,7 @@ export default function OrdersClient() {
                           </Link>
                         </div>
                         <div style={{ fontWeight: 600, color: '#1a2b22' }}>
-                          {(item.price_at_time * item.quantity).toFixed(2)} Lei
+                          {(item.price_at_time * item.quantity).toFixed(2)} RON
                         </div>
                       </div>
                     )
@@ -162,12 +162,12 @@ export default function OrdersClient() {
 
                 <div style={{ marginTop: '20px', paddingTop: '15px', borderTop: '1px dashed #e0e0e0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                   <div style={{ fontSize: '0.9rem', color: '#666' }}>
-                    Transport: {order.shipping_cost === 0 ? 'Gratuit' : `${order.shipping_cost} Lei`}
+                    Transport: {order.shipping_cost === 0 ? 'Gratuit' : `${order.shipping_cost} RON`}
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '2px' }}>Total de plată</div>
                     <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#1a2b22' }}>
-                      {order.total_amount.toFixed(2)} Lei
+                      {order.total_amount.toFixed(2)} RON
                     </div>
                   </div>
                 </div>
