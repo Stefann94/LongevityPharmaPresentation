@@ -4,7 +4,7 @@
  * Se rezolvă în ordinea priorității, ca să funcționeze corect în orice mediu
  * fără să fie nevoie de modificări în cod la schimbarea domeniului:
  *
- *   1. NEXT_PUBLIC_SITE_URL  — domeniul propriu, când va fi cumpărat (ex: https://longevityfarma.ro)
+ *   1. NEXT_PUBLIC_SITE_URL  — domeniul propriu, când va fi cumpărat (ex: https://longevitypharma.ro)
  *   2. VERCEL_PROJECT_PRODUCTION_URL — domeniul stabil de producție de pe Vercel
  *   3. VERCEL_URL — deployment-ul curent (folosit la preview-urile de pe branch-uri)
  *   4. localhost — development local

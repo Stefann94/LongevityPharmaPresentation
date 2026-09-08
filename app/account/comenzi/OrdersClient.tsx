@@ -51,7 +51,7 @@ export default function OrdersClient() {
           </div>
           <div className={styles.cardHeader}>Nu ai nicio comandă plasată încă</div>
           <p className={styles.cardContent} style={{ maxWidth: '400px', margin: '0 auto 25px auto' }}>
-            Când vei plasa prima ta comandă pe LongevityFarma, istoricul și detaliile de urmărire vor apărea aici.
+            Când vei plasa prima ta comandă pe LongevityPharma, istoricul și detaliile de urmărire vor apărea aici.
           </p>
           <Link href="/" className={styles.actionLink}>
             Începe cumpărăturile

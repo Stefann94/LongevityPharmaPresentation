@@ -6,7 +6,7 @@ import pageStyles from '../page.module.css';
 import { createStaticClient } from '@/lib/supabase/static';
 
 export const metadata = {
-  title: 'Calitate & Ingrediente | Longevity Farma',
+  title: 'Calitate & Ingrediente | Longevity Pharma',
   description: 'Nu facem compromisuri când vine vorba de calitatea și puritatea ingredientelor noastre.',
 };
 
@@ -32,7 +32,7 @@ export default async function CalitatePage() {
 
   const simple = contentMap['simple_section'] || {
     title: 'Știința purității absolute',
-    description: 'Eficiența oricărui supliment depinde de calitatea materiei prime. Din acest motiv, la Longevity Farma lucrăm exclusiv cu furnizori certificați și verificăm riguros fiecare lot de ingrediente.',
+    description: 'Eficiența oricărui supliment depinde de calitatea materiei prime. Din acest motiv, la Longevity Pharma lucrăm exclusiv cu furnizori certificați și verificăm riguros fiecare lot de ingrediente.',
     image_url: '/images/banners/calitate_ingrediente.png'
   };
 

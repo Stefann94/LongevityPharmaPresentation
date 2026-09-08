@@ -3,7 +3,7 @@ import BestsellersClient from "./BestsellersClient";
 
 
 export const metadata = {
-  title: 'Bestsellers | Longevity Farma',
+  title: 'Bestsellers | Longevity Pharma',
   description: 'Descoperă cele mai vândute suplimente premium din magazinul nostru. Produse testate și apreciate de mii de clienți.',
 };
 

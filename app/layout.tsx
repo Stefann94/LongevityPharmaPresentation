@@ -19,14 +19,14 @@ export const metadata: Metadata = {
   // Fără ea, imaginile Open Graph rămân căi relative pe care Facebook/WhatsApp
   // nu le pot rezolva, iar previzualizarea la distribuire apare goală.
   metadataBase: new URL(getSiteUrl()),
-  title: "Longevity Farma | Suplimente Premium pentru Sănătate",
+  title: "Longevity Pharma | Suplimente Premium pentru Sănătate",
   description: "Investește Astăzi în Ziua de Mâine. Suplimente alimentare premium, formulate științific pentru vitalitate, energie și funcția cognitivă.",
   keywords: ["suplimente", "longevitate", "anti-aging", "nootropice", "sanatate", "vitamine premium"],
   openGraph: {
-    title: "Longevity Farma | Suplimente Premium",
+    title: "Longevity Pharma | Suplimente Premium",
     description: "Investește Astăzi în Ziua de Mâine cu cele mai bune suplimente pentru corpul tău.",
     url: "/",
-    siteName: "Longevity Farma",
+    siteName: "Longevity Pharma",
     locale: "ro_RO",
     type: "website",
   },

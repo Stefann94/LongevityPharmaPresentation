@@ -32,11 +32,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { data: product } = await supabase.from('products').select('*').eq('slug', decodedSlug).single();
 
   if (!product) {
-    return { title: 'Produs Neregasit | Longevity Farma' };
+    return { title: 'Produs Neregasit | Longevity Pharma' };
   }
 
   return {
-    title: `${product.name} | Longevity Farma`,
+    title: `${product.name} | Longevity Pharma`,
     description: product.description || `Comandă ${product.name} la doar ${product.price} RON. Livrare rapidă.`,
     // URL-ul canonic: spune motoarelor de căutare care este adresa "oficială" a paginii.
     // Fără el, o vizită venită din reclamă (/produs/x?utm_source=google) ar putea fi
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       canonical: `/produs/${encodeURIComponent(decodedSlug)}`,
     },
     openGraph: {
-      title: `${product.name} | Longevity Farma`,
+      title: `${product.name} | Longevity Pharma`,
       description: product.description,
       images: [product.image_url],
     }
@@ -95,7 +95,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     "url": productUrl,
     "brand": {
       "@type": "Brand",
-      "name": product.brand || "Longevity Farma"
+      "name": product.brand || "Longevity Pharma"
     },
     "offers": {
       "@type": "Offer",
@@ -388,7 +388,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <div className={styles.descriptionBlock}>
               <h3 className={styles.descriptionTitle}>Informații Produs</h3>
               <p className={styles.descriptionText}>
-                {product.description || "Informațiile detaliate despre acest produs urmează a fi actualizate în curând. Formulele Longevity Farma sunt dezvoltate pentru eficiență și puritate maximă."}
+                {product.description || "Informațiile detaliate despre acest produs urmează a fi actualizate în curând. Formulele Longevity Pharma sunt dezvoltate pentru eficiență și puritate maximă."}
               </p>
             </div>
           )}

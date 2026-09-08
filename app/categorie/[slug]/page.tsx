@@ -30,21 +30,21 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     .single();
 
   if (!category) {
-    return { title: 'Categorie negăsită | Longevity Farma' };
+    return { title: 'Categorie negăsită | Longevity Pharma' };
   }
 
   const description =
     category.description ||
-    `Descoperă gama ${category.name} de la Longevity Farma: suplimente premium, formulate științific. Livrare rapidă și transport gratuit peste 200 RON.`;
+    `Descoperă gama ${category.name} de la Longevity Pharma: suplimente premium, formulate științific. Livrare rapidă și transport gratuit peste 200 RON.`;
 
   return {
-    title: `${category.name} | Longevity Farma`,
+    title: `${category.name} | Longevity Pharma`,
     description,
     alternates: {
       canonical: `/categorie/${encodeURIComponent(decodedSlug)}`,
     },
     openGraph: {
-      title: `${category.name} | Longevity Farma`,
+      title: `${category.name} | Longevity Pharma`,
       description,
       type: 'website',
     },

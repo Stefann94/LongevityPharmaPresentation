@@ -25,7 +25,7 @@ export default function NewsletterSwitch({ initialSubscribed }: { initialSubscri
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px', backgroundColor: '#f9faf9', borderRadius: '12px', border: '1px solid #eaeaea' }}>
       <div>
-        <div style={{ fontWeight: 500, color: 'var(--color-primary)', marginBottom: '4px' }}>Newsletter LongevityFarma</div>
+        <div style={{ fontWeight: 500, color: 'var(--color-primary)', marginBottom: '4px' }}>Newsletter LongevityPharma</div>
         <div style={{ fontSize: '0.9rem', color: '#666' }}>
           {isSubscribed ? 'Ești abonat! Vei primi oferte exclusive pe email.' : 'Nu ești abonat. Activează pentru a primi informații pe email.'}
         </div>

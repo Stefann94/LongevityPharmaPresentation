@@ -1,7 +1,7 @@
 import OrdersClient from './OrdersClient';
 
 export const metadata = {
-  title: 'Comenzile Mele | Longevity Farma',
+  title: 'Comenzile Mele | Longevity Pharma',
 };
 
 // Invelisul ramane componenta de server doar ca sa poata exporta `metadata`.

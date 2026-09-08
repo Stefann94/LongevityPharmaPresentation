@@ -1,7 +1,7 @@
 import CheckoutSuccessClient from './CheckoutSuccessClient'
 
 export const metadata = {
-  title: 'Comandă finalizată | Longevity Farma',
+  title: 'Comandă finalizată | Longevity Pharma',
 }
 
 // Învelișul rămâne componentă de server doar ca să poată exporta `metadata`.

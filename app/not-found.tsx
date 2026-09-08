@@ -2,7 +2,7 @@ import Link from 'next/link';
 import styles from './StatusPage.module.css';
 
 export const metadata = {
-  title: 'Pagină negăsită | Longevity Farma',
+  title: 'Pagină negăsită | Longevity Pharma',
   // Paginile de eroare nu trebuie indexate de motoarele de căutare
   robots: { index: false, follow: true },
 };

@@ -5,8 +5,8 @@ import ProductCarousel from '@/components/ProductCarousel'
 import styles from './Cart.module.css'
 
 export const metadata = {
-  title: 'Coșul meu | Longevity Farma',
-  description: 'Coșul tău de cumpărături Longevity Farma',
+  title: 'Coșul meu | Longevity Pharma',
+  description: 'Coșul tău de cumpărături Longevity Pharma',
 }
 
 /**

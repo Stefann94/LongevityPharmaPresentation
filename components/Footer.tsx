@@ -18,7 +18,7 @@ export default function Footer() {
                 </svg>
                 <div className={styles.logoTextWrapper}>
                   <div className={styles.logoText}>
-                    Longevity<span className={styles.logoTextLight}>Farma</span>
+                    Longevity<span className={styles.logoTextLight}>Pharma</span>
                   </div>
                 </div>
               </a>
@@ -126,7 +126,7 @@ export default function Footer() {
           </div>
 
           <div className={styles.copyright}>
-            <p>&copy; {new Date().getFullYear()} Longevity Farma. Toate drepturile rezervate.</p>
+            <p>&copy; {new Date().getFullYear()} Longevity Pharma. Toate drepturile rezervate.</p>
             <div className={styles.paymentMethods}>
               {/* Dummy icons for payment */}
               <div className={styles.payIcon}>VISA</div>

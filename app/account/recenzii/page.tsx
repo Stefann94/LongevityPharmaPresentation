@@ -39,7 +39,7 @@ export default function ReviewsPage() {
           </div>
           <div className={styles.cardHeader}>Nu ai lăsat încă nicio recenzie</div>
           <p className={styles.cardContent} style={{ maxWidth: '400px', margin: '0 auto' }}>
-            Părerea ta contează! Ajută comunitatea LongevityFarma lăsând un review produselor achiziționate.
+            Părerea ta contează! Ajută comunitatea LongevityPharma lăsând un review produselor achiziționate.
           </p>
         </div>
       ) : (

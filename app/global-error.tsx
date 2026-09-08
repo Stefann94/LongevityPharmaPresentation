@@ -31,7 +31,7 @@ export default function GlobalError({
           lineHeight: 1.6,
         }}
       >
-        <title>Eroare | Longevity Farma</title>
+        <title>Eroare | Longevity Pharma</title>
 
         <div
           style={{

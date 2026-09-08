@@ -265,7 +265,7 @@ export default function HeaderClient({ categories, featuredProducts, activePromo
                   </svg>
                   <div className={styles.logoTextWrapper}>
                     <div className={styles.logoText}>
-                      Longevity<span className={styles.logoTextLight}>Farma</span>
+                      Longevity<span className={styles.logoTextLight}>Pharma</span>
                     </div>
                     <span className={styles.premiumText}>Premium Quality</span>
                   </div>

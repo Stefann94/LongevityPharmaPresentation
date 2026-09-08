@@ -5,7 +5,7 @@ import { getJournalArticles, JournalArticle } from './actions';
 import styles from './Jurnal.module.css';
 
 export const metadata = {
-  title: 'Jurnal Științific | Longevity Farma',
+  title: 'Jurnal Științific | Longevity Pharma',
   description: 'Informații susținute de știință despre medicină preventivă, anti-aging, ingrediente și protocoale de sănătate.',
 };
 

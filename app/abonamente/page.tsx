@@ -3,7 +3,7 @@ import Link from 'next/link';
 import styles from './Abonamente.module.css';
 
 export const metadata = {
-  title: 'Abonamente | Longevity Farma',
+  title: 'Abonamente | Longevity Pharma',
   description: 'Alege planul de abonament care ți se potrivește și bucură-te de reduceri și beneficii exclusive la suplimentele tale preferate.',
 };
 

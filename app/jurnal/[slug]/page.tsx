@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!article) return { title: 'Articol inexistent' };
 
   return {
-    title: `${article.title} | Longevity Farma`,
+    title: `${article.title} | Longevity Pharma`,
     description: article.summary,
     alternates: {
       canonical: `/jurnal/${encodeURIComponent(article.slug)}`,
