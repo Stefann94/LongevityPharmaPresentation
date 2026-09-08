@@ -2,6 +2,11 @@ import { MetadataRoute } from 'next';
 import { createClient } from '@supabase/supabase-js';
 import { getSiteUrl } from '@/lib/site';
 
+// La export static nu exista server care sa genereze fisierul la cerere:
+// trebuie scris o singura data, la build.
+export const dynamic = 'force-static';
+
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);

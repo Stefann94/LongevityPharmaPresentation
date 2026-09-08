@@ -1,52 +1,27 @@
 import type { NextConfig } from "next";
 
-const isDev = process.env.NODE_ENV !== 'production';
-
-// Politica de securitate a conținutului (CSP).
-// A rulat întâi în modul "Report-Only" și a fost validată în producție, cu un
-// browser real, pe fluxul complet: pagină produs -> adăugare în coș -> apel
-// direct către Supabase -> coș. Zero violări raportate, deci este acum activă.
-const contentSecurityPolicy = [
-  "default-src 'self'",
-  // 'unsafe-inline' e necesar pentru scripturile inline injectate de App Router (inclusiv JSON-LD).
-  // 'unsafe-eval' doar în development, pentru hot reload.
-  // googletagmanager.com = scriptul Google Analytics 4
-  `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com${isDev ? " 'unsafe-eval'" : ''}`,
-  // CSS Modules + stilurile inline din componente
-  "style-src 'self' 'unsafe-inline'",
-  // Google Analytics trimite o parte din date prin pixeli-imagine
-  "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://*.google-analytics.com https://www.googletagmanager.com",
-  "font-src 'self' data:",
-  // Apelurile clientului Supabase (REST + realtime) + endpoint-urile de colectare GA4.
-  // *.g.doubleclick.net e necesar dacă se activează ulterior legătura cu Google Ads.
-  `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.g.doubleclick.net${isDev ? ' ws://localhost:*' : ''}`,
-  "frame-ancestors 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  "object-src 'none'",
-].join('; ');
-
-// Headere fără niciun efect asupra funcționalității unui site care nu e
-// încapsulat în iframe și nu folosește camera/microfon/geolocație.
-const securityHeaders = [
-  // Forțează HTTPS timp de 2 ani, inclusiv pe subdomenii
-  { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
-  // Împiedică încărcarea site-ului într-un iframe pe alt domeniu (clickjacking)
-  { key: 'X-Frame-Options', value: 'DENY' },
-  // Interzice browserului să "ghicească" tipul unui fișier (MIME sniffing)
-  { key: 'X-Content-Type-Options', value: 'nosniff' },
-  // Nu trimite calea completă a paginii către site-uri externe
-  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  // Dezactivează API-uri de browser pe care site-ul nu le folosește
-  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-  { key: 'X-DNS-Prefetch-Control', value: 'on' },
-  { key: 'Content-Security-Policy', value: contentSecurityPolicy },
-];
-
 const nextConfig: NextConfig = {
+  // Export static: `next build` scrie în folderul `out/` un site din fișiere
+  // HTML, CSS și JavaScript, care poate fi servit de orice server web obișnuit.
+  //
+  // Este singura formă în care site-ul poate rula pe găzduirea Hostico Start,
+  // care nu include Node.js. Toate cele 29 de rute sunt pre-generate, iar
+  // datele care depind de vizitator (coșul, contul, comenzile) se cer direct de
+  // la Supabase din browser.
+  output: 'export',
+
   // Ascunde headerul "X-Powered-By: Next.js" (nu mai anunțăm tehnologia folosită)
   poweredByHeader: false,
+
   images: {
+    // Optimizarea imaginilor este făcută la cerere, de un server care
+    // redimensionează și convertește fișierele. Nu există un astfel de server
+    // aici, deci imaginile sunt servite așa cum sunt.
+    //
+    // Componenta `next/image` continuă să funcționeze - păstrează dimensiunile
+    // rezervate, încărcarea leneșă și atributele - doar că nu mai rescrie
+    // fișierul. Aspectul rămâne neschimbat.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -54,14 +29,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async headers() {
-    return [
-      {
-        source: '/:path*',
-        headers: securityHeaders,
-      },
-    ];
-  },
+
+  // Anteturile de securitate (CSP, HSTS, X-Frame-Options și celelalte) se
+  // adăugau aici, prin funcția `headers()`. La export static nu mai există
+  // niciun server Node care să le pună pe răspuns, așa că au fost mutate în
+  // `public/.htaccess`, de unde le aplică Apache pe serverul Hostico.
+  //
+  // Valorile sunt identice, cu o singură excepție: `unsafe-eval` a fost scos
+  // din `script-src`, pentru că era necesar doar reîncărcării la cald din
+  // timpul dezvoltării.
 };
 
 export default nextConfig;
