@@ -1,42 +1,134 @@
 /*
-  "Povestea noastră" — prima secțiune de sub hero.
+  Secventa 1 — "Punctul de plecare".
 
-  ── AȘEZARE ────────────────────────────────────────────────────────────────
-  Titlul ocupă lățimea întreagă, sus. Sub el, imaginea și textul stau alături,
-  cu imaginea mai lată (1.12fr față de 0.88fr). Motivul: cât timp titlul stătea
-  lângă imagine, amândouă se strângeau. Scos deasupra, titlul respiră, iar
-  imaginea poate fi mare — pătrată, la fel de înaltă cât coloana de text.
+  ── ASEZARE ────────────────────────────────────────────────────────────────
+  Peste 1000px: titlul pe toata latimea, sus. Sub el, imaginea si textul
+  alaturi, in doua coloane egale intinse la aceeasi inaltime. Sub ele, randul
+  cu cele trei intrebari. Cat timp titlul statea langa imagine, amandoua se
+  strangeau; scos deasupra, titlul respira.
 
-  Imaginea rămâne pătrată la ORICE lățime de ecran, inclusiv pe telefon.
+  Sub 1000px asezarea NU e aceeasi pusa in coloana, ci una gandita separat:
+  fotografia devine banda de deschidere, textul urca peste ea intr-un panou
+  alb, iar cele trei intrebari se string intr-un singur panou cu trei randuri.
+  Motivul e scris pe larg in blocul RESPONSIV.
 
-  ── MIȘCARE ────────────────────────────────────────────────────────────────
-  Vezi blocul EFECTE de la finalul fișierului.
+  ── MISCARE ────────────────────────────────────────────────────────────────
+  Instalatia comuna e in app/globals.css. Aici sunt doar animatiile proprii
+  acestei secvente: numele lor si ferestrele pseudo-elementelor. Vezi blocul
+  COREGRAFIE de la finalul fisierului.
 */
 
+/* ── SCARA FLUIDA ──────────────────────────────────────────────────────────
+   Toate marimile secventei stau aici, ca sa poata fi citite dintr-o privire si
+   schimbate dintr-un loc. Fiecare e un `clamp(minim, baza + panta, maxim)`:
+   creste continuu cu latimea ferestrei, intre doua capete fixe. Asa nu exista
+   momentul in care textul sare de la o marime la alta cand tragi de fereastra
+   — se rescaleaza tot timpul, iar pragurile de mai jos raman doar pentru
+   lucrurile care chiar isi schimba asezarea.
+
+   `--adancime` inmulteste amplitudinea derivei. Pe telefon o miscare de 22px
+   inseamna mult mai mult din ecran decat pe desktop, deci se strange. */
 .sectiune {
-  /* Conținutul începe direct pe alb. Degradeul rămâne doar în hero. */
-  background: #ffffff;
-  padding: 104px 0 96px;
+  --t-eticheta: clamp(0.64rem, 0.57rem + 0.22vw, 0.72rem);
+  --t-lede: clamp(1.02rem, 0.93rem + 0.4vw, 1.18rem);
+  --t-corp: clamp(0.94rem, 0.9rem + 0.2vw, 1rem);
+  --t-citat: clamp(1.06rem, 0.92rem + 0.62vw, 1.28rem);
+  --t-legenda: clamp(0.74rem, 0.71rem + 0.13vw, 0.8rem);
+  --t-cardIndice: clamp(0.7rem, 0.66rem + 0.16vw, 0.78rem);
+  --t-cardTitlu: clamp(1.02rem, 0.95rem + 0.3vw, 1.16rem);
+  --t-cardText: clamp(0.88rem, 0.85rem + 0.16vw, 0.94rem);
+  --t-insignaNumar: clamp(1.6rem, 1.18rem + 1.4vw, 2.15rem);
+  --t-insignaText: clamp(0.7rem, 0.67rem + 0.14vw, 0.78rem);
+
+  --adancime: 1;
+
+  position: relative;
+  /* Nu alb plat: o spalare foarte slaba spre verde-cald la mijloc, ca hartia
+     de tipar. Se vede abia constient, dar scoate sectiunea din senzatia de
+     ecran gol. */
+  background:
+    radial-gradient(
+      120% 80% at 88% 0%,
+      rgba(212, 175, 55, 0.07) 0%,
+      rgba(212, 175, 55, 0) 58%
+    ),
+    linear-gradient(180deg, #ffffff 0%, #fbfcfa 48%, #ffffff 100%);
+  /* Fluid, fara praguri: se strange singur pe ecrane mici. */
+  padding: clamp(64px, 8vw, 112px) 0 clamp(58px, 7vw, 100px);
   overflow: hidden;
+}
+
+/* Granulatie fina peste tot fundalul. Doua procente de zgomot fac degradeul
+   sa para material, nu banda de culoare. */
+.sectiune::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+}
+
+.sectiune > :global(.container) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Doua pete mari de lumina, legate de traversarea INTREGII sectiuni, nu a
+   unei scene. Se misca foarte incet si nu se opresc niciodata cat timp
+   sectiunea e pe ecran — ele dau senzatia ca secventa dureaza, in timp ce
+   piesele de continut isi termina intrarea la timp. */
+.pataSus,
+.pataJos {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(60px);
+}
+
+.pataSus {
+  top: -12%;
+  right: -8%;
+  width: 46%;
+  height: 52%;
+  background: radial-gradient(
+    circle,
+    rgba(212, 175, 55, 0.16) 0%,
+    rgba(212, 175, 55, 0) 70%
+  );
+}
+
+.pataJos {
+  bottom: -14%;
+  left: -10%;
+  width: 42%;
+  height: 46%;
+  background: radial-gradient(
+    circle,
+    rgba(39, 79, 56, 0.1) 0%,
+    rgba(39, 79, 56, 0) 70%
+  );
 }
 
 /* ------------------------------------------------------------------ ANTET */
 
 .antet {
-  max-width: 920px;
-  margin-bottom: 62px;
+  max-width: 940px;
+  margin-bottom: clamp(40px, 5.5vw, 66px);
 }
 
 .eticheta {
   display: inline-block;
-  margin-bottom: 20px;
-  padding: 7px 16px;
+  margin-bottom: clamp(16px, 1.8vw, 22px);
+  padding: 7px clamp(13px, 1.4vw, 16px);
   border: 1px solid rgba(212, 175, 55, 0.45);
   border-radius: 999px;
   background: rgba(212, 175, 55, 0.09);
   color: var(--color-accent-dark);
   font-family: var(--font-heading);
-  font-size: 0.72rem;
+  font-size: var(--t-eticheta);
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -45,20 +137,23 @@
 .titlu {
   color: var(--color-primary);
   font-family: var(--font-heading);
-  font-size: clamp(1.9rem, 4.4vw, 3.35rem);
+  font-size: clamp(1.85rem, 4.3vw, 3.3rem);
   font-weight: 600;
-  line-height: 1.1;
+  line-height: 1.12;
   letter-spacing: -0.022em;
 }
 
-/* Fereastra prin care urcă fiecare cuvânt. `overflow: hidden` taie cuvântul
-   cât timp e sub linie, ca să pară că iese de sub ea.
-   Marginile de jos compensează tăierea cozilor de la ț, ș, p. */
+/* Fereastra prin care urca fiecare cuvant. `overflow: hidden` taie cuvantul
+   cat timp e sub linie, ca sa para ca iese de sub ea. */
 .masca {
   display: inline-block;
   overflow: hidden;
   vertical-align: bottom;
-  margin-right: 0.26em;
+  /* Marginile compenseaza taierea: jos pentru cozile de la t, s, p, iar in
+     dreapta pentru inclinarea cuvantului cursiv, care altfel ar fi retezat de
+     marginea mastii. Spatiul dintre cuvinte ramane acelasi: 0.14 + 0.12. */
+  margin-right: 0.12em;
+  padding-right: 0.14em;
   padding-bottom: 0.16em;
   margin-bottom: -0.16em;
 }
@@ -68,37 +163,61 @@
   display: inline-block;
 }
 
+/* Cuvantul scos in evidenta din titlu.
+   Cursiv si mai subtire decat restul frazei, in auriu inchis — aceeasi
+   conventie ca la celelalte titluri de sectiune din site (`.sectionTitle span`
+   din app/page.module.css si `.title span` din ProductCarousel). Diferenta o
+   face taietura literei, nu o linie trasa pe sub: cu italic si greutate mai
+   mica, cuvantul iese din rand fara sa fie subliniat. */
 .cuvantAccent {
   position: relative;
   color: var(--color-accent-dark);
+  font-style: italic;
+  font-weight: 400;
 }
 
-/* Linia aurie de sub cuvântul accentuat. */
-.cuvantAccent::after {
+/* Linia care inchide antetul. Firul cenusiu se traseaza pe toata latimea,
+   iar peste inceputul lui vine segmentul auriu. */
+.linieAntet {
+  position: relative;
+  height: 1px;
+  margin-top: clamp(26px, 3.2vw, 40px);
+  background: var(--color-border);
+  transform-origin: left center;
+}
+
+.linieAntet::after {
   content: '';
   position: absolute;
+  top: -1px;
   left: 0;
-  right: 0;
-  bottom: 0.16em;
-  height: 0.08em;
+  width: clamp(84px, 10vw, 132px);
+  height: 3px;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--color-accent), rgba(212, 175, 55, 0.28));
+  background: linear-gradient(90deg, var(--color-accent), rgba(212, 175, 55, 0.25));
   transform-origin: left center;
 }
 
 /* --------------------------------------------------------------- CONTINUT */
 
+/* Doua coloane egale, intinse la aceeasi inaltime.
+   `stretch`, nu `center`: cat timp imaginea era centrata pe verticala fata de
+   o coloana de text mai lunga, incepea mai jos decat textul si parea cazuta.
+   Acum ambele coloane pornesc de pe aceeasi linie, iar fotografia creste
+   singura cat tine textul, deci se si termina pe aceeasi linie. */
 .continut {
   display: grid;
-  grid-template-columns: 1.12fr 0.88fr;
-  gap: 64px;
-  align-items: center;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(38px, 4.6vw, 60px);
+  align-items: stretch;
 }
 
 /* ---- imagine ---- */
 
 .coloanaImagine {
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Aura aurie din spatele imaginii. */
@@ -115,32 +234,123 @@
   filter: blur(28px);
 }
 
+.figura {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 0;
+}
+
+/* Invelisul cadrului. Doua roluri: tine coltarele in afara fotografiei, fara
+   sa fie taiate de `overflow: hidden` de pe .rama, si preia toata inaltimea
+   ramasa dupa legenda — de aici vine potrivirea cu coloana de text. */
+.cadru {
+  position: relative;
+  flex: 1;
+  /* Pragul de jos, ca fotografia sa nu se turteasca daca textul de langa
+     ea se scurteaza. Peste el, creste dupa text. */
+  min-height: 430px;
+}
+
 .rama {
   position: relative;
-  aspect-ratio: 1 / 1;
+  height: 100%;
   overflow: hidden;
   border-radius: 26px;
   background: #f0f5f1;
-  box-shadow: 0 34px 70px -36px rgba(29, 51, 36, 0.55);
+  box-shadow:
+    0 34px 70px -36px rgba(29, 51, 36, 0.55),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14);
 }
 
-/* Imaginea e mai mare decât cadrul, ca să aibă loc să alunece în interiorul
-   lui fără să lase margini goale. */
+/* Imaginea e mai mare decat cadrul, ca sa aiba loc sa alunece in interiorul
+   lui fara sa lase margini goale. */
 .imagine {
   object-fit: cover;
   object-position: 40% 60%;
   scale: 1.06;
 }
 
-/* Badge-ul plutitor peste colțul de jos al imaginii. */
+/* Fasia de lumina care trece o data peste imagine.
+   Starea de repaus e invizibila, la fel ca starea finala. */
+.lumina {
+  position: absolute;
+  top: -25%;
+  bottom: -25%;
+  left: 0;
+  width: 38%;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  mix-blend-mode: soft-light;
+  transform: translateX(-170%) skewX(-14deg);
+}
+
+/* Coltarele aurii. Stau IN AFARA fotografiei, pe fundalul deschis: incercate
+   peste imagine, un fir de 1.5px se pierdea complet in frunzis. Se traseaza
+   dinspre coltul propriu spre cele doua brate, dupa ce cadrul s-a asezat. */
+.coltar {
+  position: absolute;
+  z-index: 2;
+  width: 62px;
+  height: 62px;
+  pointer-events: none;
+  border: 2px solid var(--color-accent);
+}
+
+.coltarSusStanga {
+  top: -16px;
+  left: -16px;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 12px 0 0 0;
+}
+
+.coltarJosDreapta {
+  right: -16px;
+  bottom: -16px;
+  border-top: none;
+  border-left: none;
+  border-radius: 0 0 12px 0;
+}
+
+.legendaImagine {
+  position: relative;
+  margin-top: clamp(14px, 1.8vw, 20px);
+  padding-left: clamp(32px, 3.6vw, 46px);
+  color: #7d8e83;
+  font-size: var(--t-legenda);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+}
+
+.legendaImagine::before {
+  content: '';
+  position: absolute;
+  top: 0.62em;
+  left: 0;
+  width: clamp(22px, 2.5vw, 32px);
+  height: 1px;
+  background: var(--color-accent);
+  transform-origin: left center;
+}
+
+/* Insigna plutitoare peste coltul de sus al imaginii. Sus-dreapta, nu
+   jos-dreapta: acolo se incaleca peste coltarul auriu de jos. */
 .insigna {
   position: absolute;
-  right: -20px;
-  bottom: 38px;
+  top: 44px;
+  right: -22px;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 19px 26px;
+  gap: clamp(10px, 1.2vw, 14px);
+  padding: clamp(14px, 1.6vw, 19px) clamp(17px, 2vw, 26px);
   border-radius: 16px;
   background: var(--color-primary);
   box-shadow: 0 24px 48px -20px rgba(29, 51, 36, 0.7);
@@ -149,7 +359,7 @@
 .insignaNumar {
   color: var(--color-accent);
   font-family: var(--font-heading);
-  font-size: 2.1rem;
+  font-size: var(--t-insignaNumar);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -157,7 +367,7 @@
 
 .insignaText {
   color: rgba(255, 255, 255, 0.82);
-  font-size: 0.78rem;
+  font-size: var(--t-insignaText);
   line-height: 1.35;
 }
 
@@ -167,66 +377,129 @@
   min-width: 0;
 }
 
+/* Fraza de deschidere, marcata cu o bara aurie verticala. */
 .introducere {
-  margin-bottom: 24px;
-  color: var(--color-primary);
-  font-size: 1.16rem;
-  font-weight: 500;
-  line-height: 1.6;
-}
-
-.paragrafe {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  color: #4a5c50;
-  font-size: 1rem;
-  line-height: 1.78;
-}
-
-/* ---- cifre ---- */
-
-.cifre {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 46px;
-  margin-top: 38px;
-  padding-top: 32px;
-  border-top: 1px solid var(--color-border);
-}
-
-.cifra {
   position: relative;
-  padding-top: 15px;
+  margin-bottom: clamp(20px, 2.4vw, 26px);
+  padding-left: clamp(17px, 2vw, 24px);
+  color: var(--color-primary);
+  font-size: var(--t-lede);
+  font-weight: 500;
+  line-height: 1.62;
 }
 
-.cifra::before {
+.introducere::before {
   content: '';
   position: absolute;
-  top: 0;
+  top: 0.3em;
+  bottom: 0.3em;
   left: 0;
-  width: 34px;
-  height: 2px;
+  width: 3px;
   border-radius: 999px;
-  background: var(--color-accent);
+  background: linear-gradient(180deg, var(--color-accent), rgba(212, 175, 55, 0.2));
+  transform-origin: top center;
+}
+
+.corp {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(15px, 1.7vw, 20px);
+  color: #4a5c50;
+  font-size: var(--t-corp);
+  line-height: 1.82;
+}
+
+/* Citatul iese din randul textului: mai mare, verde, cu ghilimeaua desenata
+   in spate. E o afirmatie de sine statatoare, nu o continuare de paragraf. */
+.citat {
+  position: relative;
+  margin: 10px 0 12px;
+  padding: 4px 0 4px clamp(28px, 3.2vw, 38px);
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-size: var(--t-citat);
+  font-weight: 500;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: -0.012em;
+}
+
+.citat::before {
+  content: '”';
+  position: absolute;
+  top: -0.16em;
+  left: -0.04em;
+  color: rgba(212, 175, 55, 0.55);
+  font-family: var(--font-heading);
+  font-size: clamp(2.6rem, 1.9rem + 2.2vw, 3.4rem);
+  font-weight: 700;
+  line-height: 1;
+  transform-origin: left top;
+}
+
+/* ------------------------------------------------------- CELE 3 INTREBARI */
+
+.intrebari {
+  margin-top: clamp(52px, 7vw, 84px);
+}
+
+/* Trei pe rand, sau unul singur — niciodata doua.
+   Cu trei carduri, un rand de doua lasa al treilea singur, cu un gol cat un
+   card langa el. Asa ca la 820px se trece direct la o coloana, iar cardurile
+   isi schimba si forma (vezi pragul de mai jos). */
+.carduri {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(18px, 2.2vw, 26px);
+  list-style: none;
+}
+
+.card {
+  position: relative;
+  padding: clamp(26px, 2.9vw, 34px) clamp(22px, 2.5vw, 30px) clamp(24px, 2.7vw, 32px);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: linear-gradient(158deg, #ffffff 0%, #f5f8f4 100%);
+  box-shadow: 0 24px 50px -38px rgba(29, 51, 36, 0.6);
+}
+
+/* Firul auriu de pe muchia de sus, tras de la stanga la dreapta. */
+.card::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 28px;
+  width: 74px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-accent), rgba(212, 175, 55, 0.2));
   transform-origin: left center;
 }
 
-.cifraValoare {
+.cardIndice {
   display: block;
-  margin-bottom: 5px;
-  color: var(--color-primary);
+  margin-bottom: clamp(10px, 1.2vw, 14px);
+  color: rgba(212, 175, 55, 0.85);
   font-family: var(--font-heading);
-  font-size: 1.9rem;
+  font-size: var(--t-cardIndice);
   font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.18em;
 }
 
-.cifraText {
-  color: #6a7b70;
-  font-size: 0.86rem;
-  letter-spacing: 0.02em;
+.cardTitlu {
+  margin-bottom: 12px;
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-size: var(--t-cardTitlu);
+  font-weight: 600;
+  line-height: 1.32;
+  letter-spacing: -0.012em;
+}
+
+.cardText {
+  color: #5c6e62;
+  font-size: var(--t-cardText);
+  line-height: 1.68;
 }
 
 /* ---- legatura ---- */
@@ -235,7 +508,7 @@
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  margin-top: 36px;
+  margin-top: clamp(30px, 3.6vw, 44px);
   padding-bottom: 4px;
   border-bottom: 1.5px solid rgba(39, 79, 56, 0.22);
   color: var(--color-primary);
@@ -260,137 +533,380 @@
 
 /* -------------------------------------------------------------- RESPONSIV */
 
-@media (max-width: 980px) {
+/*
+  Trei feluri de adaptare, in ordinea in care intra:
+
+  1. FLUID, fara praguri — marimile care pot creste continuu sunt scrise cu
+     `clamp()`, direct in regulile de baza. Fereastra poate fi trasa la orice
+     latime fara sa se vada salturi de marime.
+  2. ALTA COMPOZITIE sub 1000px — nu aceleasi piese puse una sub alta, ci o
+     asezare gandita separat. Vezi mai jos de ce.
+  3. AJUSTARI DE TELEFON sub 520px, doar acolo unde piesele suprapuse peste
+     fotografie devin prea mari fata de ecran.
+*/
+
+/* ═══════════════════════════════════════════════════════════ SUB 1000px ══
+
+   Cele doua coloane nu mai incap una langa alta: la 900px de fereastra,
+   fiecare coloana ar avea vreo 410px, iar coloana de text ar deveni de doua
+   ori mai inalta decat lata. Fotografia, intinsa sa o ajunga, ar fi o fasie
+   ingusta si inalta, taiata din ce arata de fapt poza.
+
+   Dar puse pur si simplu una sub alta, piesele devin un sir lung: titlu,
+   poza, legenda, cinci paragrafe, trei carduri. Zece blocuri stivuite, adica
+   o lista, nu o pagina.
+
+   Asa ca aici e o compozitie proprie, din TREI obiecte:
+
+     1. Fotografia devine banda de deschidere, pe toata latimea. Insigna sta
+        peste ea sus, legenda peste ea jos, pe un voal intunecat — doua piese
+        care altfel ar fi fost inca doua randuri in sir.
+     2. Textul urca PESTE marginea de jos a fotografiei, intr-un panou alb,
+        mai ingust decat ea. Suprapunerea e ce transforma doua blocuri asezate
+        unul sub altul intr-un singur obiect, cu adancime.
+     3. Cele trei intrebari se string intr-un panou unic, cu trei randuri
+        despartite de linii, in loc de trei carduri care plutesc separat.
+
+   Zece blocuri devin trei.
+   ======================================================================== */
+
+@media (max-width: 999px) {
+  .sectiune {
+    --adancime: 0.72;
+  }
+
   .continut {
     grid-template-columns: 1fr;
-    gap: 54px;
+    /* Spatiul dintre coloane dispare: textul urca peste fotografie, deci
+       distanta dintre ele se face din marginea negativa de mai jos. */
+    gap: 0;
   }
 
-  .antet {
-    margin-bottom: 46px;
+  /* ---- 1. fotografia, banda de deschidere ---- */
+
+  .cadru {
+    /* Nu mai are dupa ce sa se intinda: nu mai exista coloana alaturi. */
+    flex: none;
+    min-height: 0;
   }
 
-  /* Imaginea rămâne pătrată — nu se turtește pe ecrane mai înguste. */
+  /* Inaltime FLUIDA, nu rapoarte fixe pe praguri. Cu raportul schimbat din
+     prag in prag, fotografia sarea dintr-o forma in alta la o miscare de
+     cativa pixeli a ferestrei. Formula creste continuu: pe telefon iese in
+     picioare, pe tableta se lungeste spre banda lata.
+     Limita in vh e plasa de siguranta pentru ferestrele late si scunde, unde
+     o fotografie inalta ar impinge restul scenei sub linia de jos si
+     dezvaluirea nu s-ar mai putea incheia la timp. */
+  .rama {
+    height: min(clamp(340px, 22vw + 262px, 560px), 58vh);
+  }
+
+  /* Coltarele intra IN cadru. Afara, cu fotografia lipita de marginile
+     containerului, ajungeau sa atarne pe muchia ferestrei si aratau ca doua
+     bucati rupte. Peste fotografie s-ar fi pierdut in frunzis — de aceea
+     primesc umbra proprie, care le desprinde de orice fundal. */
+  .coltar {
+    width: 52px;
+    height: 52px;
+    filter: drop-shadow(0 2px 7px rgba(12, 26, 18, 0.6));
+  }
+
+  .coltarSusStanga {
+    top: 18px;
+    left: 18px;
+  }
+
+  /* Coltul de jos-dreapta ramane sub panoul de text, care urca peste
+     fotografie — s-ar fi vazut doar pe jumatate. Ramane un singur semn de
+     colt, sus-stanga, si arata ca o alegere, nu ca o piesa taiata. */
+  .coltarJosDreapta {
+    display: none;
+  }
 
   .insigna {
-    right: 16px;
-    bottom: -24px;
+    top: 20px;
+    right: 20px;
+  }
+
+  /* Legenda urca peste fotografie, pe un voal care se ingroasa spre baza.
+     Linia aurie devine element de rand, nu pozitionat absolut: asa ramane
+     langa text si cand legenda trece pe doua randuri. */
+  .legendaImagine {
+    position: absolute;
+    z-index: 3;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    gap: 12px;
+    /* Marginea de jos e mai mare decat suprapunerea panoului de text, ca sa
+       ramana citibila peste el. */
+    margin: 0;
+    padding: 86px clamp(20px, 3.4vw, 30px) 58px;
+    border-radius: 0 0 26px 26px;
+    background: linear-gradient(
+      180deg,
+      rgba(16, 32, 22, 0) 0%,
+      rgba(16, 32, 22, 0.5) 52%,
+      rgba(16, 32, 22, 0.78) 100%
+    );
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  .legendaImagine::before {
+    position: static;
+    flex: none;
+    width: 24px;
+    margin-top: 0.66em;
+  }
+
+  /* ---- 2. panoul de text, urcat peste fotografie ---- */
+
+  .coloanaText {
+    position: relative;
+    z-index: 4;
+    max-width: min(68ch, 100% - 26px);
+    margin: -46px auto 0;
+    padding: clamp(28px, 4vw, 40px) clamp(22px, 3.4vw, 34px) clamp(8px, 1.4vw, 14px);
+    border-radius: 24px;
+    background: #ffffff;
+    box-shadow:
+      0 -20px 46px -32px rgba(29, 51, 36, 0.5),
+      0 34px 66px -50px rgba(29, 51, 36, 0.45);
+  }
+
+  /* ---- 3. cele trei intrebari, intr-un singur panou ---- */
+
+  .intrebari {
+    margin-top: clamp(44px, 6vw, 72px);
+  }
+
+  .carduri {
+    grid-template-columns: 1fr;
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: 22px;
+    background: linear-gradient(158deg, #ffffff 0%, #f5f8f4 100%);
+    box-shadow: 0 26px 54px -40px rgba(29, 51, 36, 0.6);
+  }
+
+  /* Cardul isi pierde conturul propriu — il are panoul — si isi schimba
+     forma: indicele trece in stanga, iar randul devine lat si scund. */
+  .card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: clamp(14px, 2.4vw, 22px);
+    padding: clamp(22px, 3vw, 28px) clamp(20px, 2.8vw, 28px);
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .card + .card {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .cardIndice {
+    margin-bottom: 0;
+    padding-top: 0.28em;
+    letter-spacing: 0.1em;
+  }
+
+  .cardTitlu,
+  .cardText {
+    grid-column: 2;
+  }
+
+  /* Firul auriu ramane unul singur, pe muchia de sus a panoului. Trei fire
+     intr-un panou unic ar fi aratat ca trei carduri lipite. */
+  .card::before {
+    left: clamp(20px, 2.8vw, 28px);
+    width: 56px;
+  }
+
+  .card + .card::before {
+    display: none;
   }
 }
 
-@media (max-width: 768px) {
-  .sectiune {
-    padding: 66px 0 62px;
-  }
+/* ═════════════════════════════════════════════════════════════ TELEFON ══ */
 
-  .cifre {
-    gap: 32px;
-    margin-top: 32px;
+@media (max-width: 620px) {
+  .sectiune {
+    /* Miscarea lenta se strange: 22px pe un ecran de 1440 abia se simt, pe
+       unul de 390 sar in ochi. */
+    --adancime: 0.5;
   }
 }
 
 @media (max-width: 520px) {
   .insigna {
-    right: 12px;
-    padding: 15px 19px;
+    top: 14px;
+    right: 14px;
+    gap: 11px;
+    padding: 13px 17px;
   }
 
-  .insignaNumar {
-    font-size: 1.65rem;
+  .coltar {
+    width: 38px;
+    height: 38px;
+    border-width: 1.5px;
   }
 
-  .cifre {
-    gap: 26px;
+  .coltarSusStanga {
+    top: 13px;
+    left: 13px;
+  }
+
+  .legendaImagine {
+    gap: 10px;
+    padding: 70px 18px 50px;
+  }
+
+  .legendaImagine::before {
+    width: 18px;
+  }
+
+  .coloanaText {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .citat {
+    padding-left: 28px;
   }
 }
 
-/* ================================================================ EFECTE ==
+/* Ferestre foarte scunde (telefon intors pe orizontala, ferestre mici pe
+   laptop). Sectiunea nu are voie sa ceara mai multa inaltime decat da
+   ecranul, altfel scenele nu mai apuca sa se dezvaluie complet. */
+@media (max-height: 620px) and (min-width: 1000px) {
+  .cadru {
+    min-height: 300px;
+  }
+}
 
-   UN SINGUR mecanism, identic in orice browser.
+/* ============================================================ COREGRAFIE ==
 
-   Animatia nu ruleaza: sta OPRITA (animation-play-state: paused) si e fixata
-   in loc de o intarziere negativa legata de cat s-a derulat. O animatie oprita
-   nu avanseaza, dar ramane afisata exact la momentul cerut de intarziere. Asa,
-   --p = 0.37 inseamna "arata cadrul de la 37% din animatie".
+   Instalatia (doua animatii oprite, fixate de `--p` si `--q`) e in
+   app/globals.css, pe `[data-in]`. Aici se declara doar CE animatie primeste
+   fiecare piesa.
 
-   Variabila --p (0 -> 1) e scrisa de components/ScrollScrub.tsx la fiecare
-   cadru de derulare. Mergi inapoi cu scroll-ul, se deruleaza inapoi.
+   Slotul 1 e intrarea, condusa de `--p`, si se incheie cand scena a ajuns
+   intreaga pe ecran. Slotul 2 e deriva, condusa de `--q`, si continua incet
+   cat timp scena traverseaza fereastra. Piesele care au doua nume de animatie
+   le primesc pe amandoua; celelalte folosesc doar prima.
 
-   Am folosit initial animation-timeline: view() — CSS nativ, fara JavaScript.
-   Am renuntat: merge doar pe Chrome si Edge, iar pe restul browserelor
-   sectiunea ramanea complet statica. Un singur drum, care merge peste tot,
-   bate doua drumuri din care unul tace.
+   Ferestrele `--s` / `--e` stau in markup, langa continut, pentru ca acolo se
+   vede ordinea. Exceptie fac pseudo-elementele, care nu pot purta atribute:
+   fereastra lor se scrie mai jos. Ele mostenesc `--s` / `--e` de la parinte,
+   deci trebuie suprascrise amandoua, nu doar una. Cardurile isi primesc
+   fereastra pseudo-elementului din markup, prin `--ps` / `--pe`, fiindca
+   depinde de pozitia fiecarui card in rand.
 
-   Fara JavaScript, --p ramane 1 si totul se vede in starea finala.
+   Fara JavaScript sau cu animatii reduse din sistem, blocul asta nu se aplica
+   deloc si secventa se vede in starea ei finala.
    ========================================================================= */
 
 @media (prefers-reduced-motion: no-preference) {
 
-  /* --- CE animatie primeste fiecare element --- */
+  /* --- fundalul sectiunii: cea mai lenta miscare din toata secventa --- */
+  .pataSus { animation-name: derivaPataSus; }
+  .pataJos { animation-name: derivaPataJos; }
 
-  .aura        { animation-name: pluteste, respira; }
-  .rama        { animation-name: descopera; }
-  .imagine     { animation-name: paralaxa; }
-  .insigna     { animation-name: dinDreapta; }
-  .eticheta    { animation-name: urca; }
+  /* --- scena 1: antetul --- */
+  .eticheta {
+    --deriva: calc(9px * var(--adancime));
+    animation-name: urcaScurt, deriva;
+  }
+
   .cuvant,
   .cuvantAccent { animation-name: dinMasca; }
-  .cuvantAccent::after { animation-name: traseaza; }
+
+  .linieAntet { animation-name: traseaza; }
+  .linieAntet::after {
+    --s: 0.6;
+    --e: 0.98;
+    animation-name: traseaza;
+  }
+
+  /* --- scena 2a: imaginea --- */
+  .aura { animation-name: pluteste; }
+  .rama {
+    --deriva: calc(12px * var(--adancime));
+    animation-name: descopera, deriva;
+  }
+  .imagine { animation-name: paralaxa; }
+
+  /* Fasia de lumina traverseaza in ritm constant; usurinta de la instalatie
+     ar fi facut-o sa tasneasca si apoi sa se tarasca. */
+  .lumina {
+    --ease: linear;
+    animation-name: trece;
+  }
+
+  .coltarSusStanga { animation-name: traseazaColtSus; }
+  .coltarJosDreapta { animation-name: traseazaColtJos; }
+
+  .legendaImagine {
+    --deriva: calc(7px * var(--adancime));
+    animation-name: urcaScurt, deriva;
+  }
+  .legendaImagine::before {
+    --s: 0.58;
+    --e: 0.96;
+    animation-name: traseaza;
+  }
+
+  .insigna {
+    --deriva: calc(22px * var(--adancime));
+    animation-name: dinDreapta, deriva;
+  }
+
+  /* --- scena 2b: textul --- */
   .introducere { animation-name: urca; }
-  .paragrafe p { animation-name: urca; }
-  .cifre       { animation-name: apare; }
-  .cifra       { animation-name: urcaScurt; }
-  .cifra::before { animation-name: traseaza; }
-  .legatura    { animation-name: urcaScurt; }
+  .introducere::before {
+    --s: 0.08;
+    --e: 0.54;
+    animation-name: creste;
+  }
 
-  /* --- Reglajele comune: oprita, fixata de --p --- */
+  .corp p { animation-name: urca; }
 
-  .aura,
-  .rama,
-  .imagine,
-  .insigna,
-  .eticheta,
-  .cuvant,
-  .cuvantAccent,
-  .cuvantAccent::after,
-  .introducere,
-  .paragrafe p,
-  .cifre,
-  .cifra,
-  .cifra::before,
+  .citat {
+    --deriva: calc(14px * var(--adancime));
+    animation-name: urcaCitat, deriva;
+  }
+  .citat::before {
+    --s: 0.34;
+    --e: 0.82;
+    animation-name: apareGhilimea;
+  }
+
+  /* --- scena 3: cele trei intrebari --- */
+  .card { animation-name: urcaPanou, deriva; }
+  .card::before {
+    --s: var(--ps, 0.3);
+    --e: var(--pe, 0.8);
+    animation-name: traseaza;
+  }
+
   .legatura {
-    animation-duration: 1s;
-    animation-timing-function: linear;
-    animation-fill-mode: both;
-    animation-play-state: paused;
-    animation-delay: calc(var(--p, 1) * -1s);
-  }
-
-  /* Pseudo-elementele nu pot purta data-scrub, deci mostenesc --p de la
-     parintele lor si pornesc mai tarziu decat el. */
-  .cuvantAccent::after,
-  .cifra::before {
-    animation-delay: calc(clamp(0, (var(--p, 1) - 0.45) / 0.55, 1) * -1s);
-  }
-
-  /* Aura are doua animatii: prima fixata de derulare, a doua libera, pe timp. */
-  .aura {
-    animation-duration: 1s, 5s;
-    animation-timing-function: linear, ease-in-out;
-    animation-iteration-count: 1, infinite;
-    animation-direction: normal, alternate;
-    animation-fill-mode: both, none;
-    animation-play-state: paused, running;
-    animation-delay: calc(var(--p, 1) * -1s), 0s;
+    --deriva: calc(8px * var(--adancime));
+    animation-name: urcaScurt, deriva;
   }
 }
 
 /* ------------------------------------------------------------- KEYFRAMES - */
 
+/* ---- intrari ---- */
+
 @keyframes urca {
   from {
     opacity: 0;
-    transform: translateY(42px);
+    transform: translateY(46px);
   }
   to {
     opacity: 1;
@@ -409,12 +925,45 @@
   }
 }
 
-@keyframes apare {
+/* Citatul intra putin mai lat decat restul textului si se strange la loc. */
+@keyframes urcaCitat {
   from {
     opacity: 0;
+    transform: translateY(34px) translateX(-14px);
   }
   to {
     opacity: 1;
+    transform: translateY(0) translateX(0);
+  }
+}
+
+/* Ghilimeaua creste din nimic, in urma citatului. */
+@keyframes apareGhilimea {
+  from {
+    opacity: 0;
+    transform: scale(0.3) rotate(-14deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Panoul urca si se aseaza dintr-o scara abia perceptibila. Treapta de la
+   58% tine opacitatea completa pe ultima parte a drumului, ca sa continue sa
+   se miste dupa ce a devenit vizibil — altfel pare ca s-a terminat la
+   jumatate. */
+@keyframes urcaPanou {
+  0% {
+    opacity: 0;
+    transform: translateY(52px) scale(0.97);
+  }
+  58% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -430,43 +979,32 @@
   }
 }
 
-/* Cadrul se ridica si se descopera de sus in jos. */
+/* Cadrul se ridica si se descopera de sus in jos, iar scara se stinge abia la
+   final — asa miscarea nu se termina odata cu dezvaluirea. */
 @keyframes descopera {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(64px);
-    clip-path: inset(0 0 88% 0 round 26px);
+    transform: translateY(66px) scale(1.045);
+    clip-path: inset(0 0 92% 0 round 26px);
   }
-  to {
+  50% {
     opacity: 1;
-    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
     clip-path: inset(0 0 0 0 round 26px);
-  }
-}
-
-/* Imaginea aluneca in interiorul cadrului, mai incet decat se misca pagina.
-   scale peste 1 pe tot parcursul, ca alunecarea sa nu descopere marginile. */
-@keyframes paralaxa {
-  from {
-    transform: translateY(-4%);
-    scale: 1.16;
-  }
-  to {
-    transform: translateY(4%);
-    scale: 1.06;
   }
 }
 
 @keyframes dinDreapta {
   from {
     opacity: 0;
-    transform: translateX(72px) rotate(6deg);
-    scale: 0.78;
+    transform: translateX(70px) rotate(5deg) scale(0.82);
   }
   to {
     opacity: 1;
-    transform: translateX(0) rotate(0deg);
-    scale: 1;
+    transform: translateX(0) rotate(0deg) scale(1);
   }
 }
 
@@ -479,22 +1017,131 @@
   }
 }
 
-@keyframes pluteste {
+@keyframes creste {
   from {
-    translate: 0 -8%;
+    transform: scaleY(0);
   }
   to {
-    translate: 0 8%;
+    transform: scaleY(1);
   }
 }
 
-@keyframes respira {
+/* Coltarul se deschide dinspre coltul lui, asa ca ambele brate par trase in
+   acelasi timp de acolo. */
+@keyframes traseazaColtSus {
   from {
-    opacity: 0.68;
-    scale: 0.92;
+    opacity: 0;
+    clip-path: inset(0 100% 100% 0);
   }
   to {
     opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes traseazaColtJos {
+  from {
+    opacity: 0;
+    clip-path: inset(100% 0 0 100%);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Lumina intra din stanga, traverseaza si dispare. Se stinge la capete, ca sa
+   nu ramana oprita pe margine daca derularea se opreste acolo. */
+@keyframes trece {
+  0% {
+    opacity: 0;
+    transform: translateX(-170%) skewX(-14deg);
+  }
+  16% {
+    opacity: 1;
+  }
+  74% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(330%) skewX(-14deg);
+  }
+}
+
+/* ---- derive: miscarea lenta, legata de traversarea completa ---- */
+
+/* Una singura pentru toate piesele; amplitudinea vine din `--deriva`, pusa in
+   markup sau in blocul de coregrafie.
+
+   Tine tot drumul scenei prin fereastra, nu doar intrarea: incepe inainte ca
+   piesa sa fi terminat de aparut si continua dupa ce s-a asezat, pana cand
+   scena iese pe sus. Piesa pleaca de sus si ajunge jos, deci ramane mereu
+   putin in urma paginii — de acolo senzatia de adancime.
+
+   Ultima parte e IESIREA: dupa ce cititorul a trecut de continut, piesa se
+   retrage foarte putin. Se intampla numai in ultima cincime a drumului, cand
+   scena e deja pe jumatate iesita din ecran, deci nu are cum sa incurce
+   citirea.
+
+   Foloseste `translate` si `scale`, adica proprietatile separate, tocmai ca sa
+   nu se bata cu intrarea, care lucreaza pe `transform`. Cele trei se compun. */
+@keyframes deriva {
+  0% {
+    translate: 0 calc(var(--deriva, 10px) * -1);
+    scale: 1;
+  }
+  80% {
+    scale: 1;
+  }
+  100% {
+    translate: 0 var(--deriva, 10px);
+    scale: 0.972;
+  }
+}
+
+@keyframes derivaPataSus {
+  from {
+    translate: 4% -14%;
+    scale: 0.86;
+  }
+  to {
+    translate: -6% 18%;
+    scale: 1.14;
+  }
+}
+
+@keyframes derivaPataJos {
+  from {
+    translate: -5% -16%;
+    scale: 1.12;
+  }
+  to {
+    translate: 6% 14%;
+    scale: 0.88;
+  }
+}
+
+@keyframes pluteste {
+  from {
+    translate: 0 -9%;
+    scale: 0.93;
+  }
+  to {
+    translate: 0 9%;
+    scale: 1.07;
+  }
+}
+
+/* Imaginea aluneca in interiorul cadrului, mai incet decat se misca pagina.
+   scale peste 1 pe tot parcursul, ca alunecarea sa nu descopere marginile. */
+@keyframes paralaxa {
+  from {
+    transform: translateY(-5%);
+    scale: 1.18;
+  }
+  to {
+    transform: translateY(5%);
     scale: 1.06;
   }
 }

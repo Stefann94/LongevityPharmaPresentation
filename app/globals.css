@@ -16,9 +16,16 @@
   
   --color-border: #e0e6e2;
   
-  /* Fonts will be imported in layout.tsx via Next.js Google Fonts */
-  --font-heading: var(--font-outfit), sans-serif;
-  --font-body: var(--font-outfit), sans-serif;
+  /* Fontul e încărcat în layout.tsx, care pune `--font-serif` chiar pe
+     `<html>` — adică pe `:root`, elementul de aici. Nu pe `<body>`: o
+     variabilă care trimite la alta se rezolvă acolo unde e DECLARATĂ, iar
+     `:root` nu poate vedea o variabilă definită pe copilul lui. Exact asta se
+     întâmpla înainte, și tot site-ul cădea pe fontul implicit al browserului.
+
+     Lanțul de rezervă contează: dacă fontul nu apucă să se încarce, pagina
+     rămâne pe un serif apropiat, nu sare pe altceva. */
+  --font-heading: var(--font-serif), Georgia, 'Times New Roman', serif;
+  --font-body: var(--font-serif), Georgia, 'Times New Roman', serif;
   
   /* Layout constraints */
   --max-width: 1200px;
@@ -173,5 +180,78 @@ ul {
   /* Zone de apăsare mai apropiate de minimul recomandat de 44px. */
   .btn {
     padding: 14px 24px;
+  }
+}
+
+/* =========================================
+   MOTORUL DE DERULARE — instalatia comuna
+
+   Aici stau doar TEVILE. Animatiile propriu-zise (numele si keyframe-urile)
+   apartin fiecarei sectiuni in parte, in modulul ei CSS — fiecare secventa de
+   continut isi are coregrafia proprie.
+
+   Cum se leaga o piesa:
+     1. Blocul care conduce coregrafia primeste `data-reveal`.
+        components/ScrollScrub.tsx ii scrie `--p` (intrarea, 0 -> 1) si
+        `--q` (traversarea completa, pentru paralaxa).
+     2. Piesa dinauntru primeste `data-in` si isi declara felia din bloc prin
+        `--s` (start) si `--e` (final).
+     3. Modulul CSS al sectiunii ii da `animation-name`.
+
+   `--s` si `--e` se mostenesc, ca orice variabila CSS. Se scriu INTOTDEAUNA
+   amandoua, pe fiecare piesa, altfel piesa preia fereastra parintelui.
+
+   Pseudo-elementele nu pot purta atribute, asa ca parintele lor primeste
+   `data-in-before` / `data-in-after`, iar fereastra si numele animatiei se
+   pun pe pseudo-element din modulul sectiunii.
+
+   Starea implicita a oricarui element animat trebuie sa fie cea FINALA
+   (vizibil, la locul lui). Fara JavaScript, `--p` ramane 1 si pagina se vede
+   intreaga. Cine are animatii reduse din sistem primeste versiunea statica —
+   blocul de mai jos nici nu se aplica.
+   ========================================= */
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-in],
+  [data-in-before]::before,
+  [data-in-after]::after {
+    /* DOUA sloturi de animatie, nu unul.
+       Slotul 1 e INTRAREA: legata de `--p`, se incheie cand blocul a ajuns
+       intreg pe ecran. Slotul 2 e DERIVA: legata de `--q`, adica de
+       traversarea completa, si se misca tot timpul cat blocul e pe ecran.
+       De aici vine senzatia ca secventa dureaza — intrarea isi termina treaba
+       la timp, iar deriva continua dupa ea, incet, pana cand blocul iese.
+
+       Cine are un singur `animation-name` foloseste doar slotul 1: CSS taie
+       listele la numarul de animatii declarate. Deci regula asta e buna si
+       pentru piesele simple, fara sa mai fie nevoie de un al doilea selector.
+
+       Cele doua nu se calca pe picioare cat timp intrarea misca `transform`
+       si deriva misca `translate` — sunt proprietati distincte, care se
+       compun. */
+    animation-duration: 1s, 1s;
+    animation-timing-function: var(--ease, cubic-bezier(0.42, 0.02, 0.26, 1)), linear;
+    animation-fill-mode: both, both;
+    /* Animatiile nu ruleaza. Stau oprite si sunt fixate in loc de
+       intarzierile negative de mai jos — asa arata exact cadrul cerut de
+       derulare. */
+    animation-play-state: paused, paused;
+    animation-delay:
+      calc(
+        clamp(0, (var(--p, 1) - var(--s, 0)) / (var(--e, 1) - var(--s, 0)), 1) * -1s
+      ),
+      /* Valoarea de rezerva a derivei e 0.5, nu 1: mijlocul drumului, adica
+         pozitia neutra. Intrarea (`--p`) cade pe 1 fiindca acolo e starea
+         finala, cea care trebuie sa se vada cand nu ruleaza JavaScript. La
+         deriva, capatul nu e o stare finala, ci extremitatea unei plutiri —
+         fara JavaScript, piesele ar fi ramas toate deplasate si micsorate. */
+      calc(var(--q, 0.5) * -1s);
+  }
+
+  /* Paralaxa: piesa nu are intrare deloc, doar traversare. Slotul 1 trece si
+     el pe `--q`. */
+  [data-in='cover'] {
+    animation-timing-function: linear, linear;
+    animation-delay: calc(var(--q, 0.5) * -1s), calc(var(--q, 0.5) * -1s);
   }
 }

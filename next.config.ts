@@ -9,6 +9,16 @@ const nextConfig: NextConfig = {
   // datele care depind de vizitator (coșul, contul, comenzile) se cer direct de
   // la Supabase din browser.
   output: 'export',
+  /* Unde se scrie build-ul. Implicit tot .next, deci nimic nu se schimba.
+     Exista ca sa se poata da un build de verificare FARA sa fie oprit
+     serverul de dezvoltare: amandoua folosesc .next, iar un build dat peste
+     el lasa Turbopack sa caute fragmente CSS pe care tocmai le-a inlocuit,
+     si in browser apare "No link element found for chunk".
+
+     Atentie: la export static, situl gata construit ajunge tot in folderul
+     asta, nu in out/. Deci un build de verificare se serveste din el. Fara
+     variabila de mediu, totul ramane ca inainte: .next si out/. */
+  distDir: process.env.NEXT_DIST_DIR || '.next',
 
   // Ascunde headerul "X-Powered-By: Next.js" (nu mai anunțăm tehnologia folosită)
   poweredByHeader: false,

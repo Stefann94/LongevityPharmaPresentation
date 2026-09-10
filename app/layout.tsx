@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -9,9 +9,33 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 import BackToTopButton from "@/components/BackToTopButton";
 import { getSiteUrl } from '@/lib/site';
 
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
+/*
+ * Fontul intregului site.
+ *
+ * Inainte era Outfit, dar nu ajungea niciodata pe pagina. Motivul: variabila
+ * lui era pusa pe `<body>`, in timp ce `--font-heading` si `--font-body` sunt
+ * declarate pe `:root` in globals.css. O variabila CSS care trimite la alta se
+ * rezolva acolo unde e DECLARATA, nu unde e folosita — iar `:root` e parintele
+ * lui `<body>` si nu poate vedea o variabila definita pe copilul lui.
+ * Declaratia devenea invalida, iar `font-family` cadea pe valoarea implicita a
+ * browserului. Tot site-ul, inclusiv cel publicat, se vedea in fontul implicit
+ * al fiecarui vizitator: Times New Roman pe Windows, Times pe iPhone, Noto
+ * Serif pe Android.
+ *
+ * De aceea variabila sta acum pe `<html>`, adica exact pe `:root`.
+ *
+ * `latin-ext` nu e optional: fara el, ș si ț ies din alt font decat restul
+ * cuvantului. Outfit era incarcat doar cu `latin`.
+ *
+ * Cursivul e cerut explicit fiindca titlurile de sectiune scot un cuvant in
+ * evidenta prin `font-style: italic`. Fara taietura cursiva reala, browserul
+ * ar fi inclinat literele drepte de la sine, ceea ce se vede.
+ */
+const serif = Source_Serif_4({
+  variable: "--font-serif",
+  subsets: ["latin", "latin-ext"],
+  style: ["normal", "italic"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -42,8 +66,8 @@ export default function RootLayout({
   // site, inclusiv cele de catalog care nu au nevoie de nimic personal.
   // Detecția utilizatorului s-a mutat în SessionProviders, în browser.
   return (
-    <html lang="ro">
-      <body className={`${outfit.variable}`}>
+    <html lang="ro" className={serif.variable}>
+      <body>
         <GoogleAnalytics />
         <ScrollToTop />
         <SessionProviders>
