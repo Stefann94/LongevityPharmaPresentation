@@ -7,6 +7,7 @@ import styles from './Article.module.css';
 import ProductSection from '@/components/ProductSection';
 import { createStaticClient } from '@/lib/supabase/static';
 import { getJournalArticles } from '../actions';
+import { produseVizibile } from '@/lib/vitrina';
 
 // Cate o pagina pre-generata pentru fiecare articol din jurnal.
 export async function generateStaticParams() {
@@ -64,6 +65,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     .from('products')
     .select('id, name, slug, image_url, price')
     .limit(4);
+
+  const produseRecomandate = produseVizibile(recommendedProducts);
 
   // Format paragraphs from plain text content
   const paragraphs = article.content.split('\n\n').filter(p => p.trim() !== '');
@@ -138,13 +141,16 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         </div>
       </article>
 
-      {/* Recomandari produse */}
-      <div className={styles.recommendedSection}>
-        <ProductSection 
-          title="Produse recomandate pentru tine" 
-          products={recommendedProducts || []} 
-        />
-      </div>
+      {/* Recomandari produse. Cu vitrina oprită dispare tot blocul, nu doar
+          lista: altfel ar rămâne spațiul gol al secțiunii sub articol. */}
+      {produseRecomandate.length > 0 && (
+        <div className={styles.recommendedSection}>
+          <ProductSection
+            title="Produse recomandate pentru tine"
+            products={produseRecomandate}
+          />
+        </div>
+      )}
     </div>
   );
 }

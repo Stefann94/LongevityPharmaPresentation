@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import RemoveFavoriteButton from './RemoveFavoriteButton';
 import { useUtilizatorCurent } from '../useUtilizatorCurent';
+import { PRODUSE_ASCUNSE } from '@/lib/vitrina';
 
 export default function FavoritesClient() {
   const { user } = useUtilizatorCurent();
@@ -26,7 +27,9 @@ export default function FavoritesClient() {
 
       let rezultat: any[] = [];
 
-      if (favorites && favorites.length > 0) {
+      // Vitrina oprită: favoritele rămase de la comenzi vechi nu mai afișează
+      // produse. Vezi lib/vitrina.ts.
+      if (!PRODUSE_ASCUNSE && favorites && favorites.length > 0) {
         const slugs = favorites.map(f => f.product_slug);
         const { data: products } = await supabase
           .from('products')

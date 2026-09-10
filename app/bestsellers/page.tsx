@@ -1,5 +1,6 @@
 import { createStaticClient } from '@/lib/supabase/static';
 import BestsellersClient from "./BestsellersClient";
+import { produseVizibile } from '@/lib/vitrina';
 
 
 export const metadata = {
@@ -16,5 +17,5 @@ export default async function BestsellersPage() {
     .eq('is_bestseller', true)
     .order('price', { ascending: false });
 
-  return <BestsellersClient products={products || []} />;
+  return <BestsellersClient products={produseVizibile(products)} />;
 }

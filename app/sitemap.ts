@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { createClient } from '@supabase/supabase-js';
 import { getSiteUrl } from '@/lib/site';
+import { produseVizibile } from '@/lib/vitrina';
 
 // La export static nu exista server care sa genereze fisierul la cerere:
 // trebuie scris o singura data, la build.
@@ -42,9 +43,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  // Fetch products
+  // Fetch products. Cu vitrina oprită lista rămâne goală: paginile de produs
+  // nu se mai generează, iar o hartă care le-ar anunța ar trimite motoarele de
+  // căutare direct în 404. Vezi lib/vitrina.ts.
   const { data: products } = await supabase.from('products').select('slug');
-  const productRoutes = (products || []).map((prod) => ({
+  const productRoutes = produseVizibile(products).map((prod) => ({
     url: `${baseUrl}/produs/${encodeSlug(prod.slug)}`,
     lastModified: new Date(),
     changeFrequency: 'monthly' as const,

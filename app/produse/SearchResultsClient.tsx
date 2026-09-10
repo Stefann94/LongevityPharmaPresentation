@@ -11,6 +11,7 @@ import FavoriteButton from '@/components/FavoriteButton';
 // moștenesc automat comportamentul responsive deja existent.
 import styles from '../categorie/[slug]/Category.module.css';
 import pageStyles from '../page.module.css';
+import { PRODUSE_ASCUNSE } from '@/lib/vitrina';
 
 type Product = {
   id: string;
@@ -39,7 +40,10 @@ export default function SearchResultsClient() {
   const [seIncarca, setSeIncarca] = useState(false);
 
   useEffect(() => {
-    if (!term) {
+    // Vitrina oprită: nu interogăm baza. `search_products` rulează în browser,
+    // deci fără garda asta produsele ascunse ar fi găsite prin căutare, chiar
+    // dacă nu mai apar nicăieri în site. Vezi lib/vitrina.ts.
+    if (PRODUSE_ASCUNSE || !term) {
       setProducts([]);
       setSeIncarca(false);
       return;

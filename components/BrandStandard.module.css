@@ -1,0 +1,413 @@
+/*
+  Secțiunea "Standardul nostru" — prima de sub hero.
+
+  Toate efectele de derulare sunt CSS pur, pe `animation-timeline: view()`.
+  Zero JavaScript, zero biblioteci: la export static ies doar fișiere .css
+  obișnuite, care se urcă pe Hostico ca oricare altele.
+
+  Regula de siguranță, respectată peste tot mai jos:
+  starea implicită a fiecărui element este cea FINALĂ (vizibil, neted, la locul
+  lui). Animațiile se adaugă doar înăuntrul lui
+  `@supports (animation-timeline: view())`. Așa, un browser care nu cunoaște
+  animațiile legate de derulare afișează secțiunea întreagă, nu una goală —
+  greșeala clasică la efectele de tip "apare la scroll".
+
+  Sunt oprite și pentru cine are `prefers-reduced-motion` pornit.
+*/
+
+/* Contorul numerelor. Trebuie înregistrat cu @property, altfel nu poate fi
+   animat — o variabilă CSS obișnuită sare direct la valoarea finală.
+   `inherits: true` ca pseudo-elementul ::after să vadă valoarea animată. */
+@property --numarator {
+  syntax: '<integer>';
+  initial-value: 0;
+  inherits: true;
+}
+
+.sectiune {
+  position: relative;
+  overflow: hidden;
+  padding: 110px 0 100px;
+  /* Alb curat. Degradeul rămâne doar în hero — conținutul începe direct pe alb. */
+  background: #ffffff;
+}
+
+/* Pata de lumină din fundal. Doar decor, deci aria-hidden în markup. */
+.fundal {
+  position: absolute;
+  inset: -18% -10%;
+  pointer-events: none;
+  background:
+    radial-gradient(46% 38% at 14% 8%, rgba(39, 79, 56, 0.09), transparent 70%),
+    radial-gradient(38% 34% at 88% 26%, rgba(212, 175, 55, 0.13), transparent 72%);
+}
+
+/* ---------------------------------------------------------------- ANTET -- */
+
+.antet {
+  max-width: 780px;
+  position: relative;
+}
+
+.eticheta {
+  display: inline-block;
+  margin-bottom: 18px;
+  padding: 7px 16px;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 999px;
+  background: rgba(212, 175, 55, 0.09);
+  color: var(--color-accent-dark);
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.titlu {
+  margin-bottom: 22px;
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-size: clamp(1.85rem, 4.2vw, 3.1rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+/* Cuvântul accentuat, subliniat cu o linie aurie care se trage la derulare. */
+.accent {
+  position: relative;
+  color: var(--color-accent-dark);
+  white-space: nowrap;
+}
+
+.accent::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.06em;
+  height: 0.1em;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-accent), rgba(212, 175, 55, 0.25));
+  transform-origin: left center;
+}
+
+.introducere {
+  color: #4a5c50;
+  font-size: 1.06rem;
+  line-height: 1.75;
+}
+
+/* ---------------------------------------------------------------- PILONI - */
+
+.grila {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  margin-top: 62px;
+}
+
+.pilon {
+  position: relative;
+  overflow: hidden;
+  padding: 30px 26px 32px;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(29, 51, 36, 0.04);
+  /* Doar culoarea, umbra și ridicarea se schimbă la hover — nu și transform-ul
+     folosit de animația de derulare, ca cele două să nu se calce. */
+  transition: border-color 0.35s ease, box-shadow 0.35s ease, translate 0.35s ease;
+}
+
+.pilon:hover {
+  border-color: rgba(212, 175, 55, 0.55);
+  box-shadow: 0 18px 40px -22px rgba(29, 51, 36, 0.42);
+  translate: 0 -6px;
+}
+
+/* Numărul de fundal, foarte estompat. */
+.index {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  color: rgba(39, 79, 56, 0.07);
+  font-family: var(--font-heading);
+  font-size: 3.2rem;
+  font-weight: 700;
+  line-height: 1;
+  user-select: none;
+}
+
+.iconita {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 20px;
+  border-radius: 15px;
+  background: #eef3ef;
+  color: var(--color-primary);
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+.pilon:hover .iconita {
+  background: var(--color-primary);
+  color: var(--color-accent);
+}
+
+/* Linia aurie de sub iconiță: se desenează de la stânga la dreapta. */
+.linie {
+  display: block;
+  width: 46px;
+  height: 2px;
+  margin-bottom: 18px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-accent), rgba(212, 175, 55, 0.2));
+  transform-origin: left center;
+}
+
+.pilonTitlu {
+  margin-bottom: 10px;
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-size: 1.09rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.pilonText {
+  color: #5b6c61;
+  font-size: 0.93rem;
+  line-height: 1.65;
+}
+
+/* ----------------------------------------------------------------- CIFRE - */
+
+.cifre {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-top: 72px;
+  padding: 46px 44px;
+  border-radius: 24px;
+  background:
+    radial-gradient(70% 130% at 88% 8%, rgba(212, 175, 55, 0.16), transparent 62%),
+    var(--color-primary);
+}
+
+.cifra {
+  text-align: center;
+}
+
+.cifraRand {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+  color: var(--color-accent);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1;
+  font-size: clamp(2.5rem, 5.4vw, 3.6rem);
+  font-variant-numeric: tabular-nums;
+}
+
+.cifraUnitate {
+  font-size: 0.52em;
+  font-weight: 600;
+}
+
+.cifraText {
+  display: block;
+  margin-top: 14px;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+/* -------------------------------------------------------------- RESPONSIV */
+
+@media (max-width: 1024px) {
+  .grila {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .sectiune {
+    padding: 74px 0 68px;
+  }
+
+  .grila {
+    gap: 16px;
+    margin-top: 46px;
+  }
+
+  .cifre {
+    grid-template-columns: 1fr;
+    gap: 34px;
+    margin-top: 52px;
+    padding: 38px 26px;
+  }
+}
+
+@media (max-width: 520px) {
+  .grila {
+    grid-template-columns: 1fr;
+  }
+
+  .pilon {
+    padding: 26px 22px 28px;
+  }
+}
+
+/* ================================================================ EFECTE ==
+   Tot ce urmează este strict adăugare. Dacă blocul nu se aplică, secțiunea
+   arată exact ca mai sus: completă și statică.
+   ========================================================================= */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+
+    /* Fundalul se mișcă mai încet decât pagina — senzația de adâncime. */
+    .fundal {
+      animation: paralaxa linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+
+    /* Antetul: fiecare rând urcă puțin mai târziu decât cel de deasupra. */
+    .eticheta {
+      animation: urca linear both;
+      animation-timeline: view();
+      animation-range: entry 4% cover 26%;
+    }
+
+    .titlu {
+      animation: urca linear both;
+      animation-timeline: view();
+      animation-range: entry 8% cover 32%;
+    }
+
+    .introducere {
+      animation: urca linear both;
+      animation-timeline: view();
+      animation-range: entry 13% cover 38%;
+    }
+
+    /* Sublinierea aurie se trage sub cuvânt, după ce titlul a intrat. */
+    .accent::after {
+      animation: traseaza linear both;
+      animation-timeline: view();
+      animation-range: entry 18% cover 42%;
+    }
+
+    /* Stâlpii intră unul după altul. Decalajul vine din --pas, pus în markup:
+       fiecare card pornește cu 7% mai târziu pe axa derulării. Pe ecran lat,
+       unde stau toți pe un rând, ăsta e singurul mod de a-i eșalona. */
+    .pilon {
+      animation: intra linear both;
+      animation-timeline: view();
+      animation-range:
+        entry calc(6% + (var(--pas, 0) * 7%))
+        cover calc(34% + (var(--pas, 0) * 7%));
+    }
+
+    .linie {
+      animation: traseaza linear both;
+      animation-timeline: view();
+      animation-range:
+        entry calc(16% + (var(--pas, 0) * 7%))
+        cover calc(44% + (var(--pas, 0) * 7%));
+    }
+
+    /* Banda cu cifre se ridică și se descoperă. */
+    .cifre {
+      animation: descopera linear both;
+      animation-timeline: view();
+      animation-range: entry 6% cover 40%;
+    }
+
+    /* Numărătoarea. Cifra din HTML se ascunde și rămâne cea generată din
+       contor, ca să nu se vadă amândouă. */
+    .cifraStatica {
+      display: none;
+    }
+
+    .cifraValoare {
+      animation: numara linear both;
+      animation-timeline: view();
+      animation-range: entry 12% cover 46%;
+    }
+
+    .cifraValoare::after {
+      counter-reset: numar var(--numarator);
+      content: counter(numar);
+    }
+  }
+}
+
+@keyframes urca {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes intra {
+  from {
+    opacity: 0;
+    transform: translateY(46px) scale(0.965);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes traseaza {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes descopera {
+  from {
+    opacity: 0;
+    transform: translateY(52px);
+    clip-path: inset(0 0 42% 0 round 24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    clip-path: inset(0 0 0 0 round 24px);
+  }
+}
+
+@keyframes paralaxa {
+  from {
+    transform: translateY(-7%);
+  }
+  to {
+    transform: translateY(7%);
+  }
+}
+
+@keyframes numara {
+  from {
+    --numarator: 0;
+  }
+  to {
+    --numarator: var(--tinta);
+  }
+}

@@ -1,0 +1,413 @@
+/*
+  Articolul de deschidere — prima secțiune de sub hero.
+
+  Efecte de derulare, toate CSS pur, toate diferite de cele din BrandStandard:
+    - imaginea intră cu un zoom-out lent (scale 1.08 -> 1) și urcă
+    - badge-ul plutitor vine lateral, din dreapta, cu întârziere
+    - rândurile de text urcă decalat, de sus în jos
+    - linia de lângă eticheta rubricii se trage spre dreapta
+
+  Aceeași regulă de siguranță ca peste tot: starea implicită e cea FINALĂ.
+  Animațiile trăiesc doar în `@supports (animation-timeline: view())`, imbricat
+  în `@media (prefers-reduced-motion: no-preference)`. Un browser fără suport
+  afișează secțiunea întreagă și statică, nu goală.
+*/
+
+.sectiune {
+  /* Conținutul începe direct pe alb — degradeul rămâne doar în hero. */
+  background: #ffffff;
+  padding: 96px 0 84px;
+}
+
+/* ---------------------------------------------------------------- ANTET -- */
+
+.antet {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 42px;
+}
+
+.eticheta {
+  flex-shrink: 0;
+  color: var(--color-accent-dark);
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.linieAntet {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.55), rgba(39, 79, 56, 0.08));
+  transform-origin: left center;
+}
+
+/* -------------------------------------------------------------- CONTINUT - */
+
+.continut {
+  display: grid;
+  grid-template-columns: 1.08fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+
+/* ---- imagine ---- */
+
+.coloanaImagine {
+  position: relative;
+}
+
+.rama {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 22px;
+  background: #f0f5f1;
+  box-shadow: 0 26px 60px -34px rgba(29, 51, 36, 0.55);
+}
+
+.imagine {
+  object-fit: cover;
+  /* Zoom fin la hover, separat de animația de derulare. */
+  transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.rama:hover .imagine {
+  transform: scale(1.04);
+}
+
+/* Badge-ul plutitor peste colțul imaginii. */
+.insigna {
+  position: absolute;
+  right: -14px;
+  bottom: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 15px 22px;
+  border-radius: 14px;
+  background: var(--color-primary);
+  box-shadow: 0 18px 38px -18px rgba(29, 51, 36, 0.6);
+}
+
+.insignaRubrica {
+  color: var(--color-accent);
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.insignaMinute {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.82rem;
+}
+
+/* ---- text ---- */
+
+.coloanaText {
+  min-width: 0;
+}
+
+.pastile {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.pastila {
+  padding: 6px 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: #f7faf8;
+  color: #5b6c61;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.titlu {
+  margin-bottom: 20px;
+  font-family: var(--font-heading);
+  font-size: clamp(1.7rem, 3.1vw, 2.55rem);
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -0.018em;
+}
+
+.titluLink {
+  color: var(--color-primary);
+  background-image: linear-gradient(var(--color-accent), var(--color-accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 2px;
+  transition: background-size 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.titluLink:hover {
+  background-size: 100% 2px;
+}
+
+.rezumat {
+  margin-bottom: 24px;
+  color: #4a5c50;
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 34px;
+  color: #6a7b70;
+  font-size: 0.88rem;
+}
+
+.autor {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.separator {
+  color: #c5d0c8;
+}
+
+/* ---- actiuni ---- */
+
+.actiuni {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.butonPrincipal {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 26px;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: #ffffff;
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, translate 0.3s ease;
+}
+
+.butonPrincipal:hover {
+  background: var(--color-primary-dark);
+  box-shadow: 0 14px 28px -14px rgba(29, 51, 36, 0.7);
+  translate: 0 -2px;
+}
+
+.butonPrincipal svg {
+  transition: translate 0.3s ease;
+}
+
+.butonPrincipal:hover svg {
+  translate: 3px 0;
+}
+
+.butonSecundar {
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 22px;
+  border: 1.5px solid rgba(39, 79, 56, 0.22);
+  border-radius: 10px;
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.butonSecundar:hover {
+  border-color: var(--color-primary);
+  background: rgba(39, 79, 56, 0.04);
+}
+
+/* -------------------------------------------------------------- RESPONSIV */
+
+@media (max-width: 900px) {
+  .continut {
+    grid-template-columns: 1fr;
+    gap: 38px;
+  }
+
+  .rama {
+    aspect-ratio: 16 / 10;
+  }
+
+  .insigna {
+    right: 16px;
+    bottom: -18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sectiune {
+    padding: 62px 0 56px;
+  }
+
+  .antet {
+    margin-bottom: 30px;
+  }
+
+  .continut {
+    gap: 46px;
+  }
+}
+
+@media (max-width: 520px) {
+  .actiuni {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .butonPrincipal,
+  .butonSecundar {
+    justify-content: center;
+  }
+}
+
+/* ================================================================ EFECTE ==
+   Strict adăugare. Fără suport, secțiunea arată exact ca mai sus.
+   ========================================================================= */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+
+    .linieAntet {
+      animation: intinde linear both;
+      animation-timeline: view();
+      animation-range: entry 6% cover 30%;
+    }
+
+    .eticheta {
+      animation: apare linear both;
+      animation-timeline: view();
+      animation-range: entry 4% cover 24%;
+    }
+
+    /* Imaginea: urcă și iese din zoom. Cadru și imagine sunt animate separat,
+       ca zoom-ul de la hover să nu se bată cu ridicarea cadrului. */
+    .rama {
+      animation: ridica linear both;
+      animation-timeline: view();
+      animation-range: entry 8% cover 40%;
+    }
+
+    .imagine {
+      animation: dezoom linear both;
+      animation-timeline: view();
+      animation-range: entry 8% cover 48%;
+    }
+
+    /* Badge-ul vine din dreapta, după ce imaginea a intrat. */
+    .insigna {
+      animation: dinDreapta linear both;
+      animation-timeline: view();
+      animation-range: entry 22% cover 52%;
+    }
+
+    /* Rândurile de text urcă unul după altul, de sus în jos. */
+    .pastile {
+      animation: urca linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 32%;
+    }
+
+    .titlu {
+      animation: urca linear both;
+      animation-timeline: view();
+      animation-range: entry 14% cover 36%;
+    }
+
+    .rezumat {
+      animation: urca linear both;
+      animation-timeline: view();
+      animation-range: entry 18% cover 40%;
+    }
+
+    .meta {
+      animation: urca linear both;
+      animation-timeline: view();
+      animation-range: entry 22% cover 44%;
+    }
+
+    .actiuni {
+      animation: urca linear both;
+      animation-timeline: view();
+      animation-range: entry 26% cover 48%;
+    }
+  }
+}
+
+@keyframes apare {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes intinde {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes urca {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ridica {
+  from {
+    opacity: 0;
+    transform: translateY(42px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dezoom {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes dinDreapta {
+  from {
+    opacity: 0;
+    transform: translateX(46px) scale(0.86);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}

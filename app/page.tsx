@@ -5,6 +5,10 @@ import { createStaticClient } from '@/lib/supabase/static';
 import ProductSection from "../components/ProductSection";
 
 import ProductCarousel from "../components/ProductCarousel";
+import OurStory from "../components/OurStory";
+import ScrollScrub from "../components/ScrollScrub";
+import BrandStandard from "../components/BrandStandard";
+import { produseVizibile } from "@/lib/vitrina";
 
 export default async function Home() {
   const supabase = createStaticClient();
@@ -35,10 +39,29 @@ export default async function Home() {
   // Folosim fallback în caz că coloana 'is_recommended' încă nu a fost creată în baza de date
   const finalRecommended = recommendedError ? essentials : recommendedProducts;
 
+  // Vitrina oprită: cele patru secțiuni primesc liste goale și se ascund
+  // singure, pentru că ProductSection și ProductCarousel returnează `null`
+  // când nu au ce afișa. Vezi lib/vitrina.ts.
+  const sectiuneEsentiale = produseVizibile(essentials);
+  const sectiuneFocus = produseVizibile(focusEnergy);
+  const sectiunePachete = produseVizibile(premiumBundles);
+  const sectiuneRecomandate = produseVizibile(finalRecommended);
+
   return (
     <>
       <main>
         <HeroCarousel slides={slides || []} />
+
+        {/* Conduce animațiile de derulare acolo unde CSS-ul nativ lipsește
+            (Firefox, Safari mai vechi). Pe Chrome/Edge iese imediat și nu
+            rulează nimic. Vezi components/ScrollScrub.tsx. */}
+        <ScrollScrub />
+
+        {/* POVESTEA NOASTRĂ — prima secțiune de prezentare de sub hero */}
+        <OurStory />
+
+        {/* STANDARDUL NOSTRU — a doua secțiune */}
+        <BrandStandard />
 
         {/* QUICK CATEGORIES */}
         <section className={styles.quickCategoriesSection}>
@@ -59,7 +82,7 @@ export default async function Home() {
         {/* PRODUCTS SECTIONS */}
         <ProductSection 
           title={<>Esențiale <span>pentru</span> Longevitate</>}
-          products={essentials || []}
+          products={sectiuneEsentiale}
           viewAllLink="/categorie/longevitate"
           badgeText="Bestseller"
         />
@@ -84,7 +107,7 @@ export default async function Home() {
 
         <ProductSection 
           title={<>Focus & <span>Claritate Mentală</span></>}
-          products={focusEnergy || []}
+          products={sectiuneFocus}
           viewAllLink="/categorie/focus"
         />
 
@@ -155,14 +178,14 @@ export default async function Home() {
 
         <ProductSection 
           title={<>Protocoale & <span>Pachete Premium</span></>}
-          products={premiumBundles || []}
+          products={sectiunePachete}
           badgeText="-15% Extra"
         />
         
         {/* RECOMMENDED CAROUSEL */}
         <ProductCarousel 
           title={<>Produse <span>Recomandate</span></>}
-          products={finalRecommended || []}
+          products={sectiuneRecomandate}
         />
 
         {/* CONTACT BANNER SECTION */}

@@ -1,5 +1,6 @@
 import { createStaticClient } from '@/lib/supabase/static';
 import PacheteClient from "./PacheteClient";
+import { produseVizibile } from '@/lib/vitrina';
 
 
 export const metadata = {
@@ -16,5 +17,5 @@ export default async function PachetePage() {
     .eq('is_premium_bundle', true)
     .order('price', { ascending: false });
 
-  return <PacheteClient products={products || []} />;
+  return <PacheteClient products={produseVizibile(products)} />;
 }

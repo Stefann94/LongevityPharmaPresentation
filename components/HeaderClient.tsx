@@ -9,6 +9,7 @@ import { logout } from '@/app/auth/actions';
 import { useCart } from '@/app/context/CartContext';
 import { useFavorites } from '@/app/context/FavoritesContext';
 import { createBrowserClient } from '@supabase/ssr';
+import { PRODUSE_ASCUNSE } from '@/lib/vitrina';
 
 type Category = { id: string; name: string; slug: string; sort_order: number; group_name?: string };
 type Product = { id: string; name: string; slug: string; image_url: string; price: number };
@@ -138,7 +139,10 @@ export default function HeaderClient({ categories, featuredProducts, activePromo
 
   // Debounced Live Search
   useEffect(() => {
-    if (!searchTerm.trim()) {
+    // Vitrina oprită: căutarea nu mai interoghează baza. Fără asta, produsele
+    // ascunse din pagini ar reapărea aici, pentru că `search_products` rulează
+    // în browser, nu la build. Vezi lib/vitrina.ts.
+    if (PRODUSE_ASCUNSE || !searchTerm.trim()) {
       setSearchResults([]);
       return;
     }
@@ -685,14 +689,18 @@ export default function HeaderClient({ categories, featuredProducts, activePromo
                     </div>
                   ))}
 
-                  <div className={styles.dropdownColumn}>
-                    <h3>Produse de Top</h3>
-                    <ul>
-                      {featuredProducts?.map((prod) => (
-                        <li key={prod.id}><Link href={`/produs/${prod.slug}`}>{prod.name}</Link></li>
-                      ))}
-                    </ul>
-                  </div>
+                  {/* Coloana dispare cu totul când nu are produse, ca să nu
+                      rămână un titlu singur în meniu. */}
+                  {featuredProducts && featuredProducts.length > 0 && (
+                    <div className={styles.dropdownColumn}>
+                      <h3>Produse de Top</h3>
+                      <ul>
+                        {featuredProducts.map((prod) => (
+                          <li key={prod.id}><Link href={`/produs/${prod.slug}`}>{prod.name}</Link></li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   <div className={styles.dropdownColumn}>
                     {activePromo && (() => {
                       const promoBody = (

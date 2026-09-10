@@ -9,11 +9,30 @@ import ProductImageZoom from '@/components/ProductImageZoom';
 import FAQAccordion from './FAQAccordion';
 import AddToCartButton from '@/components/AddToCartButton';
 import FavoriteButton from '@/components/FavoriteButton';
+import { PRODUSE_ASCUNSE } from '@/lib/vitrina';
+
+// ATENTIE: fisierul se numeste `_page.tsx`, nu `page.tsx`. Ruta /produs/[slug]
+// este PARCATA - Next.js nu recunoaste decat `page.tsx`, deci nu se genereaza
+// nicio pagina de produs.
+//
+// De ce asa si nu prin generateStaticParams gol: cu `output: export`, Next 16
+// refuza o ruta dinamica fara niciun parametru si opreste build-ul cu
+// "Page ... is missing generateStaticParams()". O lista goala nu e o optiune.
+//
+// De ce nu am redenumit tot folderul in `_produs`: AddToCartButton si
+// FavoriteButton importa ProductPage.module.css de aici.
+//
+// CA SA READUCI MAGAZINUL: redenumeste inapoi in `page.tsx` SI treci
+// PRODUSE_ASCUNSE pe false. Daca uiti a doua parte, build-ul cade cu eroarea de
+// mai sus - intentionat, ca sa nu iasa un site pe jumatate.
 
 // Lista de produse se citeste o singura data, la build, si genereaza cate o
 // pagina HTML pentru fiecare. Fara asta, Next.js ar trebui sa randeze pagina
 // la fiecare cerere, pe un server Node - ceea ce gazduirea Hostico Start nu are.
 export async function generateStaticParams() {
+  // Vitrina oprita: nu se genereaza nicio pagina de produs. Vezi lib/vitrina.ts.
+  if (PRODUSE_ASCUNSE) return [];
+
   const supabase = createStaticClient();
   const { data } = await supabase.from('products').select('slug');
   return (data ?? []).map((p: { slug: string }) => ({ slug: p.slug }));

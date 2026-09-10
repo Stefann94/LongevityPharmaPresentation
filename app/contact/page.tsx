@@ -34,9 +34,7 @@ export default function ContactPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', fontSize: '0.95rem', color: '#555' }}>
               <div>
                 <strong style={eticheta}>Email</strong>
-                <a href="mailto:contact@avogrupinvest.ro" style={legatura}>contact@avogrupinvest.ro</a>
-                <br />
-                <a href="mailto:ic@solarone.ro" style={legatura}>ic@solarone.ro</a>
+                <a href="mailto:contact@longevitypharma.ro" style={legatura}>contact@longevitypharma.ro</a>
               </div>
               <div>
                 <strong style={eticheta}>Telefon</strong>
@@ -48,24 +46,8 @@ export default function ContactPage() {
                 Str. Nordului 8A, Piatra Neamț, jud. Neamț
               </div>
               <div>
-                <strong style={eticheta}>Site-uri</strong>
-                <a href="https://www.avogrupinvest.ro/" target="_blank" rel="noopener noreferrer" style={legatura}>www.avogrupinvest.ro</a>
-                <br />
-                <a href="https://www.solarone.ro/" target="_blank" rel="noopener noreferrer" style={legatura}>www.solarone.ro</a>
-              </div>
-              <div>
                 <strong style={eticheta}>Program</strong>
                 Luni - Vineri: 09:00 - 17:00
-              </div>
-              <div style={{ borderTop: '1px solid #eee', paddingTop: '18px', fontSize: '0.85rem', color: '#777', lineHeight: 1.7 }}>
-                <strong style={{ ...eticheta, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  Date comerciale
-                </strong>
-                S.C. AVO GRUP INVEST S.R.L.<br />
-                Sediu social: Str. Nordului 8A, Piatra Neamț, jud. Neamț<br />
-                Nr. reg. com.: J27/1242/2006<br />
-                C.I.F.: RO19135483<br />
-                Administrator persoană juridică: Ionuț Ciocodan
               </div>
             </div>
           </div>

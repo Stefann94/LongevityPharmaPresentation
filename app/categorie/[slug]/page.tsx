@@ -1,6 +1,7 @@
 import { createStaticClient } from '@/lib/supabase/static';
 import { notFound } from "next/navigation";
 import CategoryClient from "./CategoryClient";
+import { produseVizibile } from '@/lib/vitrina';
 
 // Cate o pagina pre-generata pentru fiecare categorie. Vezi comentariul din
 // app/produs/[slug]/page.tsx pentru motiv.
@@ -83,7 +84,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   return (
     <CategoryClient
       category={category}
-      products={products || []}
+      products={produseVizibile(products)}
       allCategories={allCategories || []}
     />
   );
