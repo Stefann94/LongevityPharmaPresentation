@@ -34,7 +34,6 @@
   --t-corp: clamp(0.94rem, 0.9rem + 0.2vw, 1rem);
   --t-citat: clamp(1.06rem, 0.92rem + 0.62vw, 1.28rem);
   --t-legenda: clamp(0.74rem, 0.71rem + 0.13vw, 0.8rem);
-  --t-cardIndice: clamp(0.7rem, 0.66rem + 0.16vw, 0.78rem);
   --t-cardTitlu: clamp(1.02rem, 0.95rem + 0.3vw, 1.16rem);
   --t-cardText: clamp(0.88rem, 0.85rem + 0.16vw, 0.94rem);
   --t-insignaNumar: clamp(1.6rem, 1.18rem + 1.4vw, 2.15rem);
@@ -454,49 +453,91 @@
   list-style: none;
 }
 
+/* Cardul nu mai poarta numar de ordine.
+   Cele trei intrebari nu au o ordine: nu se pun una dupa alta si niciuna nu
+   vine inaintea celeilalte. Un "01" pe primul card promitea un pas care nu
+   exista, iar cele trei cifre erau si singurul lucru colorat din card, deci
+   ochiul cadea pe ele inaintea intrebarii. Ce le tine acum laolalta e forma
+   identica a panourilor si firul auriu de pe muchie, nu o numaratoare.
+
+   `overflow: hidden` tine lumina care trece peste panou in interiorul
+   colturilor rotunjite; de aceea firul de sus sta pe 0, nu pe -1px, cum statea
+   inainte ca sa acopere si conturul. */
 .card {
   position: relative;
-  padding: clamp(26px, 2.9vw, 34px) clamp(22px, 2.5vw, 30px) clamp(24px, 2.7vw, 32px);
+  overflow: hidden;
+  padding: clamp(30px, 3.2vw, 38px) clamp(24px, 2.7vw, 32px) clamp(28px, 3vw, 36px);
   border: 1px solid var(--color-border);
   border-radius: 20px;
-  background: linear-gradient(158deg, #ffffff 0%, #f5f8f4 100%);
-  box-shadow: 0 24px 50px -38px rgba(29, 51, 36, 0.6);
+  /* Aceeasi lumina aurie dinspre coltul de sus-dreapta ca a sectiunii, doar
+     mult mai slaba: leaga panoul de fundal in loc sa-l lipeasca peste el.
+     Dunga alba din interiorul muchiei de sus da grosime hartiei. */
+  background:
+    radial-gradient(
+      120% 90% at 100% 0%,
+      rgba(212, 175, 55, 0.075) 0%,
+      rgba(212, 175, 55, 0) 62%
+    ),
+    linear-gradient(158deg, #ffffff 0%, #f5f8f4 100%);
+  box-shadow:
+    0 24px 50px -38px rgba(29, 51, 36, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 /* Firul auriu de pe muchia de sus, tras de la stanga la dreapta. */
 .card::before {
   content: '';
   position: absolute;
-  top: -1px;
+  top: 0;
   left: 28px;
   width: 74px;
   height: 3px;
-  border-radius: 999px;
+  border-radius: 0 0 999px 999px;
   background: linear-gradient(90deg, var(--color-accent), rgba(212, 175, 55, 0.2));
   transform-origin: left center;
 }
 
-.cardIndice {
-  display: block;
-  margin-bottom: clamp(10px, 1.2vw, 14px);
-  color: rgba(212, 175, 55, 0.85);
-  font-family: var(--font-heading);
-  font-size: var(--t-cardIndice);
-  font-weight: 700;
-  letter-spacing: 0.18em;
+/* Lumina care trece o data peste panou, dupa ce s-a asezat.
+   Aurie si foarte slaba: pe un card aproape alb, o fasie alba nu s-ar vedea,
+   iar una mai tare ar arata a sticla lustruita. Starea de repaus e
+   invizibila, la fel ca cea finala — daca derularea se opreste oriunde in
+   afara ferestrei ei, nu se vede nimic. */
+.card::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: -30%;
+  bottom: -30%;
+  left: 0;
+  width: 46%;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(212, 175, 55, 0) 0%,
+    rgba(212, 175, 55, 0.16) 50%,
+    rgba(212, 175, 55, 0) 100%
+  );
+  transform: translateX(-150%) skewX(-12deg);
 }
 
 .cardTitlu {
-  margin-bottom: 12px;
+  position: relative;
+  z-index: 2;
+  margin-bottom: clamp(12px, 1.4vw, 16px);
   color: var(--color-primary);
   font-family: var(--font-heading);
   font-size: var(--t-cardTitlu);
   font-weight: 600;
-  line-height: 1.32;
-  letter-spacing: -0.012em;
+  line-height: 1.34;
+  /* Fara numar deasupra, titlul e primul lucru din card si poarta singur
+     greutatea; se strange putin, ca orice titlu care creste. */
+  letter-spacing: -0.016em;
 }
 
 .cardText {
+  position: relative;
+  z-index: 2;
   color: #5c6e62;
   font-size: var(--t-cardText);
   line-height: 1.68;
@@ -691,13 +732,11 @@
     box-shadow: 0 26px 54px -40px rgba(29, 51, 36, 0.6);
   }
 
-  /* Cardul isi pierde conturul propriu — il are panoul — si isi schimba
-     forma: indicele trece in stanga, iar randul devine lat si scund. */
+  /* Cardul isi pierde conturul propriu — il are panoul — si devine un rand
+     lat si scund, despartit de urmatorul printr-o linie. */
   .card {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    column-gap: clamp(14px, 2.4vw, 22px);
-    padding: clamp(22px, 3vw, 28px) clamp(20px, 2.8vw, 28px);
+    overflow: visible;
+    padding: clamp(24px, 3.2vw, 30px) clamp(20px, 2.8vw, 28px);
     border: 0;
     border-radius: 0;
     background: none;
@@ -708,17 +747,6 @@
     border-top: 1px solid var(--color-border);
   }
 
-  .cardIndice {
-    margin-bottom: 0;
-    padding-top: 0.28em;
-    letter-spacing: 0.1em;
-  }
-
-  .cardTitlu,
-  .cardText {
-    grid-column: 2;
-  }
-
   /* Firul auriu ramane unul singur, pe muchia de sus a panoului. Trei fire
      intr-un panou unic ar fi aratat ca trei carduri lipite. */
   .card::before {
@@ -727,6 +755,13 @@
   }
 
   .card + .card::before {
+    display: none;
+  }
+
+  /* Si lumina, din acelasi motiv: trei fasii care trec prin acelasi panou l-ar
+     fi rupt inapoi in trei bucati. Aici cele trei randuri sunt un singur
+     obiect. */
+  .card::after {
     display: none;
   }
 }
@@ -812,6 +847,20 @@
 
 @media (prefers-reduced-motion: no-preference) {
 
+  /* --- tonul intregii secvente ---------------------------------------------
+     `--ease`: pornire hotarata, asezare lunga. Instalatia comuna are o curba
+     aproape simetrica, buna la orice; aici vrem altceva. Piesa strabate cea mai
+     mare parte a drumului in prima treime a ferestrei ei si isi petrece tot
+     restul oprindu-se. De aici vine "repede, dar nu grabit": ochiul prinde
+     imediat ca ceva s-a intamplat, dar nu vede nimic tresarind la capat.
+
+     Valul — marginea moale care descopera textul — e piesa comuna a site-ului
+     si sta tot in app/globals.css, pe `data-val`. Aici se aleg doar unghiurile
+     si animatiile care il misca. */
+  .sectiune {
+    --ease: cubic-bezier(0.17, 0.73, 0.21, 1);
+  }
+
   /* --- fundalul sectiunii: cea mai lenta miscare din toata secventa --- */
   .pataSus { animation-name: derivaPataSus; }
   .pataJos { animation-name: derivaPataJos; }
@@ -822,8 +871,13 @@
     animation-name: urcaScurt, deriva;
   }
 
+  /* Coltul din stanga-jos, nu centrul: cuvantul pare tras in sus de un capat,
+     nu rotit in jurul lui. Vezi @keyframes dinMasca. */
   .cuvant,
-  .cuvantAccent { animation-name: dinMasca; }
+  .cuvantAccent {
+    transform-origin: 0 100%;
+    animation-name: dinMasca;
+  }
 
   .linieAntet { animation-name: traseaza; }
   .linieAntet::after {
@@ -866,31 +920,50 @@
   }
 
   /* --- scena 2b: textul --- */
-  .introducere { animation-name: urca; }
+  /* Unghi mai inclinat decat restul: e paragraful cel mai lat al coloanei, iar
+     inclinarea valului se vede abia cand are randuri peste care sa alunece. */
+  .introducere {
+    --valUnghi: 105deg;
+    animation-name: valLede;
+  }
   .introducere::before {
     --s: 0.08;
     --e: 0.54;
     animation-name: creste;
   }
 
-  .corp p { animation-name: urca; }
+  .corp p { animation-name: valText; }
 
+  /* Aproape vertical: valul trece peste toate randurile citatului deodata, nu
+     de sus in jos ca la paragrafe. E o afirmatie de sine statatoare, deci se
+     arata dintr-o bucata. */
   .citat {
+    --valUnghi: 97deg;
     --deriva: calc(14px * var(--adancime));
-    animation-name: urcaCitat, deriva;
+    animation-name: valCitat, deriva;
   }
   .citat::before {
-    --s: 0.34;
-    --e: 0.82;
+    --s: 0.3;
+    --e: 0.78;
     animation-name: apareGhilimea;
   }
 
-  /* --- scena 3: cele trei intrebari --- */
+  /* --- scena 3: cele trei intrebari ---
+     Trei miscari peste acelasi panou, decalate: panoul urca, firul auriu se
+     traseaza pe muchia lui de sus, iar la urma lumina trece o data peste el.
+     Lumina e ultima dinadins — vine dupa ce panoul s-a oprit, deci pare ca
+     asezarea lui a aprins-o. */
   .card { animation-name: urcaPanou, deriva; }
   .card::before {
     --s: var(--ps, 0.3);
     --e: var(--pe, 0.8);
     animation-name: traseaza;
+  }
+  .card::after {
+    --s: var(--ss, 0.4);
+    --e: var(--se, 0.95);
+    --ease: linear;
+    animation-name: trecePanou;
   }
 
   .legatura {
@@ -903,37 +976,98 @@
 
 /* ---- intrari ---- */
 
-@keyframes urca {
-  from {
-    opacity: 0;
-    transform: translateY(46px);
+/* Paragrafele corpului. Trei lucruri deodata, fiecare mic: valul trece peste
+   text, textul urca putin si iese dintr-o ceata foarte fina.
+
+   Ordinea in care se termina conteaza mai mult decat marimile. Ceata se
+   limpezeste pe la jumatatea drumului, inaintea celorlalte doua: in clipa in
+   care textul devine citibil e deja clar, si abia dupa aceea se opreste din
+   urcat. Invers ar fi fost o pata care se aseaza — se citeste ca defect, nu ca
+   miscare.
+
+   Deplasarea e de 14px, nu de 58 cat era inainte: valul face toata treaba de
+   dezvaluire, deci urcarea ramane doar un accent. Cu cinci paragrafe unul sub
+   altul, orice mai mult inseamna o coloana care freamata.
+
+   Nu are opacitate deloc: masca ascunde textul mai bine decat ar face-o
+   transparenta, iar o stingere peste val ar fi facut si partea deja
+   descoperita sa palpaie. */
+@keyframes valText {
+  0% {
+    transform: translateY(14px);
+    filter: blur(2.6px);
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
   }
-  to {
-    opacity: 1;
+  52% {
+    filter: blur(0);
+  }
+  100% {
     transform: translateY(0);
+    filter: blur(0);
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
   }
 }
 
+/* Introducerea — acelasi val, cu putin mai mult din fiecare. E primul rand
+   citit din coloana si deschide textul, asa cum fotografia deschide cealalta
+   coloana. */
+@keyframes valLede {
+  0% {
+    transform: translateY(20px);
+    filter: blur(5px);
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+  56% {
+    filter: blur(0);
+  }
+  100% {
+    transform: translateY(0);
+    filter: blur(0);
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
+  }
+}
+
+/* Piesele mici — eticheta, legenda, legatura. Urca putin si se limpezesc.
+   Amplitudine mica dinadins: sunt piese de serviciu si nu trebuie sa fure
+   privirea de la text. */
 @keyframes urcaScurt {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(13px);
+    filter: blur(3px);
   }
-  to {
+  60% {
+    filter: blur(0);
+  }
+  100% {
     opacity: 1;
     transform: translateY(0);
+    filter: blur(0);
   }
 }
 
-/* Citatul intra putin mai lat decat restul textului si se strange la loc. */
-@keyframes urcaCitat {
-  from {
-    opacity: 0;
-    transform: translateY(34px) translateX(-14px);
+/* Citatul iese din randul textului, deci si valul lui e altfel: muchia aproape
+   verticala (vezi --valUnghi), deci trece peste toate randurile odata, si o
+   marire abia perceptibila, care il aduce spre cititor in loc sa-l ridice. */
+@keyframes valCitat {
+  0% {
+    transform: translateY(12px) scale(0.988);
+    filter: blur(4px);
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0) translateX(0);
+  54% {
+    filter: blur(0);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
   }
 }
 
@@ -941,7 +1075,7 @@
 @keyframes apareGhilimea {
   from {
     opacity: 0;
-    transform: scale(0.3) rotate(-14deg);
+    transform: scale(0.62) rotate(-8deg);
   }
   to {
     opacity: 1;
@@ -949,16 +1083,16 @@
   }
 }
 
-/* Panoul urca si se aseaza dintr-o scara abia perceptibila. Treapta de la
-   58% tine opacitatea completa pe ultima parte a drumului, ca sa continue sa
-   se miste dupa ce a devenit vizibil — altfel pare ca s-a terminat la
+/* Panoul urca si se aseaza dintr-o scara abia perceptibila. Treapta de la 52%
+   tine opacitatea completa pe toata ultima parte a drumului — panoul continua
+   sa se miste dupa ce a devenit intreg vizibil, altfel pare ca s-a terminat la
    jumatate. */
 @keyframes urcaPanou {
   0% {
     opacity: 0;
-    transform: translateY(52px) scale(0.97);
+    transform: translateY(30px) scale(0.986);
   }
-  58% {
+  52% {
     opacity: 1;
   }
   100% {
@@ -967,40 +1101,86 @@
   }
 }
 
-/* Cuvantul urca de sub linie, taiat de masca parintelui. */
-@keyframes dinMasca {
-  from {
+/* Lumina care trece o data peste un panou asezat. Aurie, nu alba: pe un card
+   aproape alb, o fasie alba nu s-ar vedea deloc. Se stinge la ambele capete,
+   ca sa nu ramana oprita pe mijlocul panoului daca derularea se opreste
+   chiar acolo. */
+@keyframes trecePanou {
+  0% {
     opacity: 0;
-    transform: translateY(108%) rotate(4deg);
+    transform: translateX(-150%) skewX(-12deg);
   }
-  to {
+  22% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(330%) skewX(-12deg);
+  }
+}
+
+/* Cuvantul urca de sub linie, taiat de masca parintelui, si se limpezeste pe
+   ultima parte a drumului.
+
+   Inclinarea e de doua grade si se face din coltul din stanga-jos, nu din
+   centru: cuvantul pare tras in sus de un capat, nu rotit. Peste vreo trei
+   grade incepe sa se vada ca efect; sub un grad nu se mai vede deloc si raman
+   treisprezece cuvinte care doar urca la fel. */
+@keyframes dinMasca {
+  0% {
+    opacity: 0;
+    transform: translateY(104%) rotate(2deg);
+    filter: blur(3px);
+  }
+  34% {
+    opacity: 1;
+  }
+  70% {
+    filter: blur(0);
+  }
+  100% {
     opacity: 1;
     transform: translateY(0) rotate(0deg);
+    filter: blur(0);
   }
 }
 
 /* Cadrul se ridica si se descopera de sus in jos, iar scara se stinge abia la
    final — asa miscarea nu se termina odata cu dezvaluirea. */
+/* Dezvaluirea fotografiei, in trei timpi.
+   Intai o fasie ingusta la mijloc, ca o fanta. Fasia se largeste in lateral,
+   apoi cortina coboara pana jos. Intre timp cadrul urca si se aseaza dintr-o
+   marire usoara, deci ultimul lucru care se opreste e chiar imaginea.
+
+   Toate valorile decupajului sunt in procente, si la plecare, si la sosire:
+   asa nu ramane nicio nelamurire despre cum se face trecerea intre ele. */
 @keyframes descopera {
   0% {
     opacity: 0;
-    transform: translateY(66px) scale(1.045);
-    clip-path: inset(0 0 92% 0 round 26px);
+    transform: translateY(46px) scale(1.055);
+    clip-path: inset(0% 13% 94% 13% round 26px);
   }
-  50% {
+  28% {
     opacity: 1;
+    clip-path: inset(0% 7% 74% 7% round 26px);
+  }
+  60% {
+    clip-path: inset(0% 0% 34% 0% round 26px);
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
-    clip-path: inset(0 0 0 0 round 26px);
+    clip-path: inset(0% 0% 0% 0% round 26px);
   }
 }
 
 @keyframes dinDreapta {
   from {
     opacity: 0;
-    transform: translateX(70px) rotate(5deg) scale(0.82);
+    transform: translateX(32px) rotate(1.6deg) scale(0.94);
   }
   to {
     opacity: 1;

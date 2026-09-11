@@ -254,4 +254,46 @@ ul {
     animation-timing-function: linear, linear;
     animation-delay: calc(var(--q, 0.5) * -1s), calc(var(--q, 0.5) * -1s);
   }
+
+  /* ── VALUL ────────────────────────────────────────────────────────────────
+     Felul in care apare textul pe tot site-ul.
+
+     Nu e o stingere si nu e o alunecare: e o margine moale care trece peste
+     text si il lasa in urma facut. Trecerea de la opac la transparent tine cat
+     un rand intreg, deci muchia nu se vede niciodata ca muchie — se vede doar
+     textul care se scrie. Unghiul o inclina putin fata de verticala, asa incat
+     randurile de jos ale unui paragraf se descopera cu o clipa in urma celor de
+     sus: un paragraf se citeste de sus in jos, deci asa se si arata.
+
+     Se pune pe orice piesa de text prin atributul `data-val`, langa `data-in`.
+     Animatia care il misca apartine sectiunii, ca orice alta animatie, si tot
+     ce trebuie sa faca e sa duca `mask-position` de la 100% la 0%.
+
+     Proportiile sunt legate intre ele si nu se ating separat: masca e de trei
+     ori mai lata decat elementul, deci partea opaca trebuie sa tina cel putin o
+     treime — aici 40% — ca textul asezat sa fie descoperit pana la ultima
+     litera, iar transparenta completa trebuie sa inceapa inainte de 66.7%, ca la
+     celalalt capat sa nu ramana nimic vizibil.
+
+     `--valUnghi` inclina muchia: peste 90deg o apleaca spre randurile de jos.
+     Starea scrisa aici e cea de REPAUS, deci si cea finala — masca la 0%, cu
+     partea opaca peste tot elementul. Animatia o duce inapoi si o aduce la loc,
+     deci fara JavaScript textul se vede intreg. */
+  [data-val] {
+    --val: linear-gradient(
+      var(--valUnghi, 102deg),
+      #000 0 40%,
+      rgba(0, 0, 0, 0.5) 52%,
+      rgba(0, 0, 0, 0) 64%
+    );
+
+    -webkit-mask-image: var(--val);
+    mask-image: var(--val);
+    -webkit-mask-size: 300% 100%;
+    mask-size: 300% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
+  }
 }

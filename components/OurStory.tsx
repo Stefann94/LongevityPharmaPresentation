@@ -94,7 +94,7 @@ export default function OurStory() {
           <span
             className={styles.eticheta}
             data-in
-            style={{ '--s': 0, '--e': 0.4 } as React.CSSProperties}
+            style={{ '--s': 0, '--e': 0.32 } as React.CSSProperties}
           >
             Punctul de plecare
           </span>
@@ -105,9 +105,15 @@ export default function OurStory() {
                 <span
                   className={cuvant === CUVANT_ACCENTUAT ? styles.cuvantAccent : styles.cuvant}
                   data-in
+                  /* Fereastra unui cuvant tine 0.19 din drumul antetului, iar
+                     pasul dintre cuvinte e 0.023 — deci vreo opt cuvinte sunt
+                     in miscare in acelasi timp si titlul intreg se aseaza pe la
+                     0.49, cu mult inainte ca antetul sa fie vazut in intregime.
+                     Ferestre mai lungi faceau titlul sa se scrie in urma
+                     derularii; un pas mai mare il rupea in cuvinte separate. */
                   style={{
-                    '--s': +(0.03 + i * 0.021).toFixed(3),
-                    '--e': +(0.31 + i * 0.021).toFixed(3),
+                    '--s': +(0.02 + i * 0.023).toFixed(3),
+                    '--e': +(0.21 + i * 0.023).toFixed(3),
                   } as React.CSSProperties}
                 >
                   {cuvant}
@@ -124,7 +130,7 @@ export default function OurStory() {
             aria-hidden="true"
             data-in
             data-in-after=""
-            style={{ '--s': 0.42, '--e': 0.82 } as React.CSSProperties}
+            style={{ '--s': 0.44, '--e': 0.84 } as React.CSSProperties}
           />
         </header>
 
@@ -154,7 +160,7 @@ export default function OurStory() {
                 <div
                   className={styles.rama}
                   data-in
-                  style={{ '--s': 0, '--e': 0.52 } as React.CSSProperties}
+                  style={{ '--s': 0, '--e': 0.5 } as React.CSSProperties}
                 >
                   {/* .webp, nu .png: la export static imaginile sunt servite
                       neoptimizate (vezi next.config.ts), iar originalul avea
@@ -184,7 +190,7 @@ export default function OurStory() {
                 className={styles.legendaImagine}
                 data-in
                 data-in-before=""
-                style={{ '--s': 0.44, '--e': 0.88 } as React.CSSProperties}
+                style={{ '--s': 0.46, '--e': 0.86 } as React.CSSProperties}
               >
                 Concentrația unui extract se stabilește în laborator, nu pe ambalaj
               </figcaption>
@@ -195,7 +201,7 @@ export default function OurStory() {
             <div
               className={styles.insigna}
               data-in
-              style={{ '--s': 0.32, '--e': 0.78 } as React.CSSProperties}
+              style={{ '--s': 0.34, '--e': 0.76 } as React.CSSProperties}
             >
               <span className={styles.insignaNumar}>3</span>
               <span className={styles.insignaText}>
@@ -211,8 +217,9 @@ export default function OurStory() {
             <p
               className={styles.introducere}
               data-in
+              data-val
               data-in-before=""
-              style={{ '--s': 0, '--e': 0.42 } as React.CSSProperties}
+              style={{ '--s': 0, '--e': 0.34 } as React.CSSProperties}
             >
               În Uniunea Europeană, un supliment alimentar se notifică, nu se
               autorizează. Nimeni nu-i cere producătorului dovada că doza de pe
@@ -221,13 +228,16 @@ export default function OurStory() {
 
             <div className={styles.corp}>
               {CORP.map((bucata, i) => {
-                /* Pasul e ales astfel incat ultima bucata sa se aseze la 0.92
-                   din progresul scenei — deci inainte ca scena sa fi ajuns
-                   intreaga pe ecran. Daca se mai adauga un paragraf, pasul
-                   trebuie strans, altfel ultimul intra prea tarziu. */
+                /* Fereastra unui paragraf tine 0.34 din drumul coloanei, iar
+                   pasul e 0.115: al doilea paragraf incepe cand primul e pe la
+                   o treime, deci valul pare ca trece pe sub ele fara sa se
+                   opreasca. Ultimul se aseaza la 0.85, adica inainte ca scena
+                   sa fi ajuns intreaga pe ecran — asta e regula care nu se
+                   incalca. Daca se mai adauga un paragraf, pasul trebuie strans
+                   la 0.095, altfel ultimul iese din drum. */
                 const fereastra = {
-                  '--s': +(0.06 + i * 0.1).toFixed(3),
-                  '--e': +(0.52 + i * 0.1).toFixed(3),
+                  '--s': +(0.05 + i * 0.115).toFixed(3),
+                  '--e': +(0.39 + i * 0.115).toFixed(3),
                 } as React.CSSProperties;
 
                 return bucata.tip === 'citat' ? (
@@ -235,13 +245,14 @@ export default function OurStory() {
                     key={i}
                     className={styles.citat}
                     data-in
+                    data-val
                     data-in-before=""
                     style={fereastra}
                   >
                     {bucata.text}
                   </blockquote>
                 ) : (
-                  <p key={i} data-in style={fereastra}>
+                  <p key={i} data-in data-val style={fereastra}>
                     {bucata.text}
                   </p>
                 );
@@ -260,21 +271,31 @@ export default function OurStory() {
                 className={styles.card}
                 data-in
                 data-in-before=""
-                /* --s / --e: fereastra cardului. --ps / --pe: fereastra firului
-                   auriu de pe muchia lui de sus, care nu poate purta atribute
-                   proprii. --deriva: amplitudinea plutirii lente, alternata
-                   intre carduri ca sa se miste in adancimi diferite. */
+                data-in-after=""
+                /* Trei ferestre pentru acelasi card, in ordinea in care se
+                   vad, fiindca pseudo-elementele nu pot purta atribute proprii:
+
+                     --s / --e    panoul urca si se aseaza;
+                     --ps / --pe  firul auriu se traseaza pe muchia de sus;
+                     --ss / --se  lumina trece o data peste panou.
+
+                   Lumina PORNESTE exact cand panoul si-a incheiat urcarea si se
+                   incheie la 0.99 pentru ultimul card — pana la capatul drumului,
+                   dar inainte de el. Daca ar depasi 1, s-ar opri in mijlocul
+                   panoului si ar ramane acolo cat timp scena e pe ecran.
+
+                   --deriva: amplitudinea plutirii lente, alternata intre carduri
+                   ca sa se miste in adancimi diferite. */
                 style={{
-                  '--s': +(0.04 + i * 0.13).toFixed(3),
-                  '--e': +(0.56 + i * 0.13).toFixed(3),
-                  '--ps': +(0.26 + i * 0.13).toFixed(3),
-                  '--pe': +(0.68 + i * 0.13).toFixed(3),
+                  '--s': +(0.04 + i * 0.135).toFixed(3),
+                  '--e': +(0.44 + i * 0.135).toFixed(3),
+                  '--ps': +(0.26 + i * 0.135).toFixed(3),
+                  '--pe': +(0.58 + i * 0.135).toFixed(3),
+                  '--ss': +(0.44 + i * 0.135).toFixed(3),
+                  '--se': +(0.72 + i * 0.135).toFixed(3),
                   '--deriva': `calc(${i === 1 ? 20 : 9}px * var(--adancime))`,
                 } as React.CSSProperties}
               >
-                <span className={styles.cardIndice} aria-hidden="true">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
                 <h3 className={styles.cardTitlu}>{intrebare.titlu}</h3>
                 <p className={styles.cardText}>{intrebare.text}</p>
               </li>
@@ -285,7 +306,7 @@ export default function OurStory() {
             href="/calitate"
             className={styles.legatura}
             data-in
-            style={{ '--s': 0.5, '--e': 0.92 } as React.CSSProperties}
+            style={{ '--s': 0.52, '--e': 0.9 } as React.CSSProperties}
           >
             Despre calitate și ingrediente
             <svg

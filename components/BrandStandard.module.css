@@ -1,18 +1,23 @@
 /*
   Secțiunea "Standardul nostru" — prima de sub hero.
 
-  Toate efectele de derulare sunt CSS pur, pe `animation-timeline: view()`.
-  Zero JavaScript, zero biblioteci: la export static ies doar fișiere .css
-  obișnuite, care se urcă pe Hostico ca oricare altele.
+  Mișcarea la derulare folosește motorul comun al site-ului: components/
+  ScrollScrub.tsx scrie progresul pe blocurile marcate cu `data-reveal`, iar
+  instalația din app/globals.css îl transformă în animații oprite, fixate pe
+  cadrul cerut de derulare.
+
+  Secțiunea folosea înainte `animation-timeline: view()` — CSS pur, dar
+  cunoscut doar de Chrome și Edge. În Firefox și în Safari mai vechi nu se
+  întâmpla nimic aici, în timp ce restul paginii se anima. Acum toate
+  secțiunile se mișcă la fel, în toate browserele, și se derulează la fel și
+  înapoi, când cititorul urcă înapoi la ele.
 
   Regula de siguranță, respectată peste tot mai jos:
   starea implicită a fiecărui element este cea FINALĂ (vizibil, neted, la locul
-  lui). Animațiile se adaugă doar înăuntrul lui
-  `@supports (animation-timeline: view())`. Așa, un browser care nu cunoaște
-  animațiile legate de derulare afișează secțiunea întreagă, nu una goală —
-  greșeala clasică la efectele de tip "apare la scroll".
-
-  Sunt oprite și pentru cine are `prefers-reduced-motion` pornit.
+  lui). Animațiile se adaugă doar în blocul COREGRAFIE de la final. Fără
+  JavaScript, sau cu `prefers-reduced-motion` pornit, secțiunea se vede
+  întreagă — nu una goală, greșeala clasică la efectele de tip "apare la
+  scroll".
 */
 
 /* Contorul numerelor. Trebuie înregistrat cu @property, altfel nu poate fi
@@ -158,6 +163,51 @@
   color: var(--color-accent);
 }
 
+/* Lumina care trece o dată peste stâlp, după ce s-a așezat. Aurie și foarte
+   slabă: pe un panou alb, o fâșie albă nu s-ar vedea deloc, iar una mai tare ar
+   arăta a sticlă lustruită. Starea de repaus e invizibilă, la fel ca cea
+   finală — dacă derularea se oprește oriunde în afara ferestrei ei, nu se vede
+   nimic. */
+.pilon::after,
+.cifre::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: -30%;
+  bottom: -30%;
+  left: 0;
+  width: 46%;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(212, 175, 55, 0) 0%,
+    rgba(212, 175, 55, 0.16) 50%,
+    rgba(212, 175, 55, 0) 100%
+  );
+  transform: translateX(-150%) skewX(-12deg);
+}
+
+/* Pe verdele închis al benzii, aurul se pierde: acolo lumina e albă. */
+.cifre::after {
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.13) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+/* Conținutul stă peste lumină, nu sub ea. */
+.iconita,
+.linie,
+.pilonTitlu,
+.pilonText,
+.cifra {
+  position: relative;
+  z-index: 2;
+}
+
 /* Linia aurie de sub iconiță: se desenează de la stânga la dreapta. */
 .linie {
   display: block;
@@ -187,6 +237,8 @@
 /* ----------------------------------------------------------------- CIFRE - */
 
 .cifre {
+  position: relative;
+  overflow: hidden;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 30px;
@@ -264,111 +316,159 @@
   }
 }
 
-/* ================================================================ EFECTE ==
-   Tot ce urmează este strict adăugare. Dacă blocul nu se aplică, secțiunea
-   arată exact ca mai sus: completă și statică.
+/* ============================================================ COREGRAFIE ==
+
+   Instalatia (doua animatii oprite, fixate de `--p` si `--q`) e in
+   app/globals.css, pe `[data-in]`. Aici se declara doar CE animatie primeste
+   fiecare piesa; ferestrele `--s` / `--e` stau in markup, langa continut,
+   pentru ca acolo se vede ordinea.
+
+   Tot ce urmeaza este strict adaugare. Daca blocul nu se aplica, sectiunea
+   arata exact ca mai sus: completa si statica.
    ========================================================================= */
 
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
+@media (prefers-reduced-motion: no-preference) {
 
-    /* Fundalul se mișcă mai încet decât pagina — senzația de adâncime. */
-    .fundal {
-      animation: paralaxa linear both;
-      animation-timeline: view();
-      animation-range: cover 0% cover 100%;
-    }
+  /* Aceeasi curba ca in restul site-ului: piesa strabate cea mai mare parte a
+     drumului in prima treime a ferestrei ei si isi petrece restul oprindu-se. */
+  .sectiune {
+    --ease: cubic-bezier(0.17, 0.73, 0.21, 1);
+  }
 
-    /* Antetul: fiecare rând urcă puțin mai târziu decât cel de deasupra. */
-    .eticheta {
-      animation: urca linear both;
-      animation-timeline: view();
-      animation-range: entry 4% cover 26%;
-    }
+  /* Fundalul se misca mai incet decat pagina — senzatia de adancime. Legat de
+     traversarea INTREGII sectiuni, nu de intrarea unei scene, deci nu se
+     opreste niciodata cat timp sectiunea e pe ecran. */
+  .fundal { animation-name: paralaxa; }
 
-    .titlu {
-      animation: urca linear both;
-      animation-timeline: view();
-      animation-range: entry 8% cover 32%;
-    }
+  /* --- antetul --- */
+  .eticheta { animation-name: urca; }
 
-    .introducere {
-      animation: urca linear both;
-      animation-timeline: view();
-      animation-range: entry 13% cover 38%;
-    }
+  /* Titlul si introducerea sunt descoperite de val — vezi `data-val` in
+     app/globals.css. Unghiul e mai inclinat la titlu: are randuri mari, peste
+     care inclinarea chiar se vede. */
+  .titlu {
+    --valUnghi: 105deg;
+    animation-name: valTitlu;
+  }
 
-    /* Sublinierea aurie se trage sub cuvânt, după ce titlul a intrat. */
-    .accent::after {
-      animation: traseaza linear both;
-      animation-timeline: view();
-      animation-range: entry 18% cover 42%;
-    }
+  .introducere { animation-name: val; }
 
-    /* Stâlpii intră unul după altul. Decalajul vine din --pas, pus în markup:
-       fiecare card pornește cu 7% mai târziu pe axa derulării. Pe ecran lat,
-       unde stau toți pe un rând, ăsta e singurul mod de a-i eșalona. */
-    .pilon {
-      animation: intra linear both;
-      animation-timeline: view();
-      animation-range:
-        entry calc(6% + (var(--pas, 0) * 7%))
-        cover calc(34% + (var(--pas, 0) * 7%));
-    }
+  /* Sublinierea aurie se trage sub cuvant, dupa ce titlul s-a asezat.
+     Fereastra vine din markup prin `--as` / `--ae`, fiindca pseudo-elementele
+     nu pot purta atribute proprii. */
+  .accent::after {
+    --s: var(--as, 0.46);
+    --e: var(--ae, 0.84);
+    animation-name: traseaza;
+  }
 
-    .linie {
-      animation: traseaza linear both;
-      animation-timeline: view();
-      animation-range:
-        entry calc(16% + (var(--pas, 0) * 7%))
-        cover calc(44% + (var(--pas, 0) * 7%));
-    }
+  /* --- stalpii ---
+     Trei miscari decalate peste acelasi panou: panoul urca, linia aurie se
+     traseaza sub iconita, iar la urma lumina trece o data peste el. Lumina e
+     ultima dinadins — vine dupa ce panoul s-a oprit, deci pare ca asezarea lui
+     a aprins-o.
 
-    /* Banda cu cifre se ridică și se descoperă. */
-    .cifre {
-      animation: descopera linear both;
-      animation-timeline: view();
-      animation-range: entry 6% cover 40%;
-    }
+     Stalpul NU primeste deriva, desi celelalte panouri ale site-ului o au:
+     plutirea lenta merge pe `translate`, iar `translate` e chiar proprietatea
+     cu care se ridica stalpul la hover. Una ar fi anulat-o pe cealalta, si
+     hover-ul ar fi pierdut, fiindca animatia bate tranzitia. */
+  .pilon { animation-name: intra; }
 
-    /* Numărătoarea. Cifra din HTML se ascunde și rămâne cea generată din
-       contor, ca să nu se vadă amândouă. */
-    .cifraStatica {
-      display: none;
-    }
+  .linie { animation-name: traseaza; }
 
-    .cifraValoare {
-      animation: numara linear both;
-      animation-timeline: view();
-      animation-range: entry 12% cover 46%;
-    }
+  .pilon::after {
+    --s: var(--ss, 0.4);
+    --e: var(--se, 0.9);
+    --ease: linear;
+    animation-name: treceLumina;
+  }
 
-    .cifraValoare::after {
-      counter-reset: numar var(--numarator);
-      content: counter(numar);
-    }
+  /* --- banda cu cifre --- */
+  .cifre { animation-name: descopera; }
+
+  .cifre::after {
+    --s: var(--ss, 0.5);
+    --e: var(--se, 0.88);
+    --ease: linear;
+    animation-name: treceLumina;
+  }
+
+  /* Numaratoarea. Cifra scrisa in HTML se ascunde si ramane cea generata din
+     contor, ca sa nu se vada amandoua. Regula sta aici, in blocul care se
+     aplica doar cand animatiile merg: fara ele, cifra din HTML e singura care
+     ramane si se vede valoarea reala. */
+  .cifraStatica {
+    display: none;
+  }
+
+  .cifraValoare { animation-name: numara; }
+
+  .cifraValoare::after {
+    counter-reset: numar var(--numarator);
+    content: counter(numar);
   }
 }
 
+/* ------------------------------------------------------------- KEYFRAMES - */
+
+/* Piesele mici. Urca putin si se limpezesc dintr-o ceata fina. */
 @keyframes urca {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(14px);
+    filter: blur(3px);
   }
-  to {
+  60% {
+    filter: blur(0);
+  }
+  100% {
     opacity: 1;
     transform: translateY(0);
+    filter: blur(0);
   }
 }
 
-@keyframes intra {
-  from {
-    opacity: 0;
-    transform: translateY(46px) scale(0.965);
+/* Valul de baza: marginea moale trece peste text, textul urca putin si iese
+   dintr-o ceata foarte fina. Ceata se limpezeste inaintea celorlalte doua —
+   cand textul devine citibil e deja clar, si abia dupa aceea se opreste din
+   urcat. Nu are opacitate: masca ascunde mai bine decat ar face-o
+   transparenta, iar o stingere peste val ar face si partea deja descoperita
+   sa palpaie. */
+@keyframes val {
+  0% {
+    transform: translateY(14px);
+    filter: blur(2.6px);
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+  52% {
+    filter: blur(0);
+  }
+  100% {
+    transform: translateY(0);
+    filter: blur(0);
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
+  }
+}
+
+/* Titlul — acelasi val, cu putin mai mult din fiecare. E cel mai mare text al
+   sectiunii, deci suporta o miscare mai ampla fara sa para agitat. */
+@keyframes valTitlu {
+  0% {
+    transform: translateY(22px);
+    filter: blur(5px);
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+  56% {
+    filter: blur(0);
+  }
+  100% {
+    transform: translateY(0);
+    filter: blur(0);
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
   }
 }
 
@@ -381,16 +481,54 @@
   }
 }
 
+/* Stalpul urca si se aseaza dintr-o scara abia perceptibila. Treapta de la 52%
+   tine opacitatea completa pe toata ultima parte a drumului: panoul continua sa
+   se miste dupa ce a devenit intreg vizibil, altfel pare ca s-a terminat la
+   jumatate. */
+@keyframes intra {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) scale(0.988);
+  }
+  52% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Banda cu cifre se ridica si se descopera de sus in jos. */
 @keyframes descopera {
   from {
     opacity: 0;
-    transform: translateY(52px);
-    clip-path: inset(0 0 42% 0 round 24px);
+    transform: translateY(32px);
+    clip-path: inset(0 0 38% 0 round 24px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
     clip-path: inset(0 0 0 0 round 24px);
+  }
+}
+
+/* Lumina care trece o data peste un panou asezat. Se stinge la ambele capete,
+   ca sa nu ramana oprita pe mijloc daca derularea se opreste chiar acolo. */
+@keyframes treceLumina {
+  0% {
+    opacity: 0;
+    transform: translateX(-150%) skewX(-12deg);
+  }
+  22% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(330%) skewX(-12deg);
   }
 }
 
