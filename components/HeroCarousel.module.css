@@ -53,7 +53,6 @@
      ocupa loc in grila si inaltimea ar fi cazut inapoi pe slide-ul curent. */
   visibility: hidden;
   opacity: 0;
-  transition: opacity 0.45s ease;
 }
 
 .textSlideActiv {
@@ -75,6 +74,38 @@
 
 .textSlideActiv .description {
   animation: fadeInUp 0.5s 0.08s ease-out both;
+}
+
+/*
+  TRECEREA DINTRE SLIDE-URI
+
+  Regulile de mai sus se joaca doar la incarcarea paginii. Alunecarea dintre
+  slide-uri nu e in CSS: o face JavaScript-ul, cadru cu cadru, scriind direct
+  `transform`, `visibility` si `opacity` pe text si pe imagine (vezi "banda"
+  din HeroCarousel.tsx). Cand banda se opreste, le sterge si hero-ul revine la
+  regulile de aici. `overflow: hidden` de pe `.heroWrapper` taie continutul la
+  marginea ecranului cat timp trece.
+
+  De la prima schimbare, sectiunea primeste `.inMiscare`, iar randurile
+  textului isi pierd animatiile de intrare: se misca impreuna cu banda, nu
+  fiecare pe cont propriu.
+*/
+.inMiscare .textSlideActiv .label,
+.inMiscare .textSlideActiv .title,
+.inMiscare .textSlideActiv .description {
+  animation: none;
+}
+
+/* Cine are animatiile reduse din sistem nu primeste nicio deplasare: banda
+   nu porneste, iar slide-ul se schimba pe loc, prin transparenta. */
+@media (prefers-reduced-motion: reduce) {
+  .textSlide {
+    transition: opacity 0.45s ease;
+  }
+
+  .imageWrapper {
+    transition: opacity 0.8s ease-in-out;
+  }
 }
 
 .label {
@@ -342,7 +373,6 @@
   width: 100%;
   height: 100%;
   opacity: 0;
-  transition: opacity 0.8s ease-in-out;
 }
 
 .imageActive {
